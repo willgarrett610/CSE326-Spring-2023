@@ -51,7 +51,7 @@ public class Renderer {
         World world = player.world;
 
         float playerAngle = player.angle;
-        Vec2f playerLocation = player.location;
+        Vec2f playerLocation = player.location.clone();
         int playerSector = player.sector;
 
         // Store top and bottom positions of walls all the way across the screen

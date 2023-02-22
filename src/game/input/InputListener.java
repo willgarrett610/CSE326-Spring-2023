@@ -45,22 +45,22 @@ public class InputListener implements KeyListener, MouseMotionListener {
 
     public void checkInput() {
         double rAngle = Math.toRadians(player.angle);
-        Vec2f vel = new Vec2f(player.location.x,player.location.y);
+        Vec2f moveTo = new Vec2f(player.location.x,player.location.y);
         if (isPressed('A')) {
-            vel.x -= Math.sin(rAngle + Math.toRadians(90)) * movementSpeed;
-            vel.y -= Math.cos(rAngle + Math.toRadians(90)) * movementSpeed;
+            moveTo.x -= Math.sin(rAngle + Math.toRadians(90)) * movementSpeed;
+            moveTo.y -= Math.cos(rAngle + Math.toRadians(90)) * movementSpeed;
         }
         if (isPressed('D')) {
-            vel.x += Math.sin(rAngle + Math.toRadians(90)) * movementSpeed;
-            vel.y += Math.cos(rAngle + Math.toRadians(90)) * movementSpeed;
+            moveTo.x += Math.sin(rAngle + Math.toRadians(90)) * movementSpeed;
+            moveTo.y += Math.cos(rAngle + Math.toRadians(90)) * movementSpeed;
         }
         if (isPressed('W')) {
-            vel.x += Math.sin(rAngle) * movementSpeed;
-            vel.y += Math.cos(rAngle) * movementSpeed;
+            moveTo.x += Math.sin(rAngle) * movementSpeed;
+            moveTo.y += Math.cos(rAngle) * movementSpeed;
         }
         if (isPressed('S')) {
-            vel.x -= Math.sin(rAngle) * movementSpeed;
-            vel.y -= Math.cos(rAngle) * movementSpeed;
+            moveTo.x -= Math.sin(rAngle) * movementSpeed;
+            moveTo.y -= Math.cos(rAngle) * movementSpeed;
         }
 
         if (keys.contains(KeyEvent.VK_LEFT)) {
@@ -70,7 +70,7 @@ public class InputListener implements KeyListener, MouseMotionListener {
             player.angle += Settings.mouseSpeed;
         }
 
-        player.move(vel);
+        player.move(moveTo);
     }
 
     @Override
