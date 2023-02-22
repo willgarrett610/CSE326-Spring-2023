@@ -347,6 +347,7 @@ public class Renderer {
         mapG.fillPolygon(xs, ys, playerSector.vertices.length);
 
         // Draw walls
+        mapG.setColor(Color.YELLOW);
         for (Sector sector : world.sectors) {
             for (int i = 0; i < sector.vertices.length; i++) {
                 Vec2f p1Trans = translatePoint(world.vertices.get(sector.vertices[(i == 0 ? sector.vertices.length : i) - 1]), angle);
@@ -359,7 +360,6 @@ public class Renderer {
         mapG.setColor(Color.GRAY);
         mapG.fillOval(midP.x - 2, midP.y - 2, 4, 4);
         mapG.drawLine(midP.x, midP.y, midP.x, midP.y - pointerLength);
-        mapG.setColor(Color.YELLOW);
 
         // Draw green circle on point of wall that is in the center of the screen
         if (lookingPoint != null) {
