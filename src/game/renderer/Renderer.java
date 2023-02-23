@@ -51,7 +51,7 @@ public class Renderer {
         World world = player.world;
 
         float playerAngle = player.angle;
-//        Vec2f playerLocation = player.location.clone();
+        Vec2f playerLocation = player.location.clone();
         int playerSector = player.sector;
 
         // Store top and bottom positions of walls all the way across the screen
@@ -72,7 +72,7 @@ public class Renderer {
         while ((head = renderQueue.poll()) != null) {
             Sector sector = world.sectors.get(head.sector);
 
-            renderQueue.addAll(renderSector(g, playerAngle, playerSector, world, sector, head, yTop, yBottom));
+            renderQueue.addAll(renderSector(g, playerAngle, playerLocation, playerSector, world, sector, head, yTop, yBottom));
 
             boolean complete = true;
             for (int i = 0; i < width; i++) {
@@ -95,6 +95,7 @@ public class Renderer {
     public List<QueueItem> renderSector(
             Graphics g,
             float playerAngle,
+            Vec2f playerLocation,
             int playerSectorI,
             World world,
             Sector sector,
@@ -111,8 +112,8 @@ public class Renderer {
         for (int i = 0; i < sector.vertices.length; i++) {
             // p1Trans is the vertex to the left of the current vertex index.
             // Since the index to the left of i = 0 would be -1, we wrap around and use the last vertex instead.
-            Vec2f p1Trans = translatePoint(world.vertices.get(sector.vertices[(i == 0 ? sector.vertices.length : i) - 1]), playerAngle);
-            Vec2f p2Trans = translatePoint(world.vertices.get(sector.vertices[i]), playerAngle);
+            Vec2f p1Trans = relativePoint(world.vertices.get(sector.vertices[(i == 0 ? sector.vertices.length : i) - 1]), playerAngle);
+            Vec2f p2Trans = relativePoint(world.vertices.get(sector.vertices[i]), playerAngle);
 
             // Check if wall is within field of view
             //
@@ -295,7 +296,9 @@ public class Renderer {
                     //vLine(g, x, ceilYClamp, floorYClamp, Color.GREEN);
                 }
                 // Floor line
-                floorVLine(g, x, floorYClamp, yBottom[x], relFloorHeight);
+                Vec2f bottomLeft = new Vec2f(0,0);
+                Vec2f upperRight = new Vec2f(20,20);
+                floorVLine(g, x, floorYClamp, yBottom[x], bottomLeft, upperRight, relFloorHeight, playerAngle, playerLocation);
 //                vLine(g, x, floorYClamp, yBottom[x], Color.BLUE);
 
                 yTop[x] = 0;
@@ -345,7 +348,7 @@ public class Renderer {
         int[] ys = new int[playerSector.vertices.length];
         for (int i = 0; i < playerSector.vertices.length; i++) {
             Vec2f vert = world.vertices.get(playerSector.vertices[i]);
-            vert = translatePoint(vert, angle);
+            vert = relativePoint(vert, angle);
             xs[i] = (int) (vert.x * mapSize * mapZoom) + midP.x;
             ys[i] = (int) (-vert.y * mapSize * mapZoom) + midP.y;
         }
@@ -355,8 +358,8 @@ public class Renderer {
         mapG.setColor(Color.YELLOW);
         for (Sector sector : world.sectors) {
             for (int i = 0; i < sector.vertices.length; i++) {
-                Vec2f p1Trans = translatePoint(world.vertices.get(sector.vertices[(i == 0 ? sector.vertices.length : i) - 1]), angle);
-                Vec2f p2Trans = translatePoint(world.vertices.get(sector.vertices[i]), angle);
+                Vec2f p1Trans = relativePoint(world.vertices.get(sector.vertices[(i == 0 ? sector.vertices.length : i) - 1]), angle);
+                Vec2f p2Trans = relativePoint(world.vertices.get(sector.vertices[i]), angle);
                 mapG.drawLine((int) (p1Trans.x * mapSize * mapZoom) + midP.x, (int) (-p1Trans.y * mapSize * mapZoom) + midP.y, (int) (p2Trans.x * mapSize * mapZoom) + midP.x, (int) (-p2Trans.y * mapSize * mapZoom) + midP.y);
             }
         }
@@ -375,10 +378,16 @@ public class Renderer {
         return map;
     }
 
-    public Vec2f translatePoint(Vec2f point, float angle) {
+    public Vec2f relativePoint(Vec2f point, float angle) {
         double rAngle = Math.toRadians(angle);
         return new Vec2f((float) (((point.x - player.location.x) * Math.cos(rAngle)) - ((point.y - player.location.y) * Math.sin(rAngle))),
                 (float) (((point.y - player.location.y) * Math.cos(rAngle)) + ((point.x - player.location.x) * Math.sin(rAngle))));
+    }
+
+    public Vec2f worldPoint(Vec2f point, float angle, Vec2f pos) {
+        double rAngle = Math.toRadians(360 - angle);
+        return new Vec2f((float) (point.x * Math.cos(rAngle) - point.y * Math.sin(rAngle) - pos.x),
+                (float) (point.y * Math.cos(rAngle) + point.x * Math.sin(rAngle) - pos.y));
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
@@ -435,23 +444,26 @@ public class Renderer {
         return new Vec2f(xOut,yOut);
     }
 
-    public Vec2f screenToFloor(float x, float y, float floorHeight) {
+    public Vec2f screenToFloor(float x, float y, float floorHeight, float angle, Vec2f pos) {
         float yOut = this.vFov * floorHeight / y;
         float xOut = x * yOut / this.hFov;
 
-        return new Vec2f(xOut,yOut);
+        return worldPoint(new Vec2f(xOut,yOut), angle, pos);
     }
 
-    public void floorVLine(Graphics g, int x, int y1, int y2, float floorHeight) {
+    public void floorVLine(Graphics g, int x, int y1, int y2, Vec2f bl, Vec2f ur, float floorHeight, float angle, Vec2f pos) {
         float scale = 20;
         for (int y = y1; y <= y2; y++) {
-            Vec2f worldPos = screenToFloor((float) x - (float)width/2, (float) y - (float)height/2, floorHeight);
-            if (Math.abs(worldPos.x/scale) < 1 && Math.abs(worldPos.y/scale) < 1) {
-                g.setColor(Color.getHSBColor(Math.abs(worldPos.x)/scale, 1, Math.abs(worldPos.y)/scale));
-            } else {
-                g.setColor(Color.BLUE);
-            }
-            g.drawLine(x,y,x,y);
+                Vec2f worldPos = screenToFloor((float) x - (float) width / 2, (float) y - (float) height / 2, floorHeight, angle, pos);
+                int iX = (int) Math.abs(Math.floor(wall.getWidth() * (worldPos.x - bl.x) / (ur.x - bl.x))) % wall.getWidth();
+                int iY = (int) Math.abs(Math.floor(wall.getHeight() * (worldPos.y - bl.y) / (ur.y - bl.y))) % wall.getHeight();
+                g.setColor(intToColor(wall.getRGB(iX, iY)));
+                //if (Math.abs(worldPos.x/scale) < 1 && Math.abs(worldPos.y/scale) < 1) {
+                //    g.setColor(Color.getHSBColor(Math.abs(worldPos.x)/scale, 1, Math.abs(worldPos.y)/scale));
+                //} else {
+                //    g.setColor(Color.BLUE);
+                //}
+                g.drawLine(x, y, x, y);
         }
     }
 
