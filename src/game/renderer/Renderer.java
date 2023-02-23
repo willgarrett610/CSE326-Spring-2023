@@ -25,7 +25,7 @@ public class Renderer {
     int pointerLength = 20;
     float hFov;
     float vFov;
-    int ceilingHeight = 20;
+
     int eyeHeight = 5;
 
     Vec2f lookingPoint = null;
@@ -51,7 +51,7 @@ public class Renderer {
         World world = player.world;
 
         float playerAngle = player.angle;
-        Vec2f playerLocation = player.location.clone();
+//        Vec2f playerLocation = player.location.clone();
         int playerSector = player.sector;
 
         // Store top and bottom positions of walls all the way across the screen
@@ -68,7 +68,7 @@ public class Renderer {
         Queue<QueueItem> renderQueue = new LinkedList<>();
         renderQueue.add(new QueueItem(player.sector, -2, 0, width-1));
 
-        QueueItem head = null;
+        QueueItem head;
         while ((head = renderQueue.poll()) != null) {
             Sector sector = world.sectors.get(head.sector);
 
@@ -123,8 +123,8 @@ public class Renderer {
             }
 
             // Get screen intersection points with black magic
-            Vec2f int1 = getIntersect(p1Trans, p2Trans, new Vec2f(-0.0001f,0.0001f), new Vec2f(-(width/2), 5));
-            Vec2f int2 = getIntersect(p1Trans, p2Trans, new Vec2f(0.0001f,0.0001f), new Vec2f((width/2), 5));
+            Vec2f int1 = getIntersect(p1Trans, p2Trans, new Vec2f(-0.0001f,0.0001f), new Vec2f(-((float)width/2), 5));
+            Vec2f int2 = getIntersect(p1Trans, p2Trans, new Vec2f(0.0001f,0.0001f), new Vec2f(((float)width/2), 5));
 
             Vec2f p1TransCut = p1Trans;
             Vec2f p2TransCut = p2Trans;
@@ -172,10 +172,13 @@ public class Renderer {
             // Calculate ceiling and floor heights with projection
             float heightOff = (sector.floorHeight - playerSector.floorHeight);
 
-            int leftCeilY = (int) (-((sector.ceilingHeight - sector.floorHeight) - eyeHeight + heightOff) * leftScale.y) + heightHalf;
-            int leftFloorY = (int) ((eyeHeight - heightOff) * leftScale.y) + heightHalf;
-            int rightCeilY = (int) (-((sector.ceilingHeight - sector.floorHeight) - eyeHeight + heightOff) * rightScale.y) + heightHalf;
-            int rightFloorY = (int) ((eyeHeight - heightOff) * rightScale.y) + heightHalf;
+            float relFloorHeight = heightOff - eyeHeight;
+            float relCeilHeight = relFloorHeight + (sector.ceilingHeight - sector.floorHeight);
+
+            int leftCeilY = (int) (-relCeilHeight * leftScale.y) + heightHalf;
+            int leftFloorY = (int) (-relFloorHeight * leftScale.y) + heightHalf;
+            int rightCeilY = (int) (-relCeilHeight * rightScale.y) + heightHalf;
+            int rightFloorY = (int) (-relFloorHeight * rightScale.y) + heightHalf;
 
 
 
@@ -285,14 +288,15 @@ public class Renderer {
                 // Draw vertical lines to fill wall
 
                 // Ceiling line
-                vLine(g, x, yTop[x], (int) ceilYClamp, Color.DARK_GRAY);
+                vLine(g, x, yTop[x], ceilYClamp, Color.DARK_GRAY);
                 if (portalSector == null) {
                     // Wall line
                     imgVline(g, x, ceilYClamp, floorYClamp, tx, ty, th, wall);
                     //vLine(g, x, ceilYClamp, floorYClamp, Color.GREEN);
                 }
                 // Floor line
-                vLine(g, x, floorYClamp, yBottom[x], Color.BLUE);
+                floorVLine(g, x, floorYClamp, yBottom[x], relFloorHeight);
+//                vLine(g, x, floorYClamp, yBottom[x], Color.BLUE);
 
                 yTop[x] = 0;
                 yBottom[x] = 0;
@@ -300,8 +304,8 @@ public class Renderer {
                 if (portalSector != null) {
                     portalCeilY += portalCeilM;
                     portalFloorY += portalFloorM;
-                    int portalCeilYClamp = clamp((int) portalCeilY, (int) ceilYClamp, (int) floorYClamp);
-                    int portalFloorYClamp = clamp((int) portalFloorY, (int) ceilYClamp, (int) floorYClamp);
+                    int portalCeilYClamp = clamp((int) portalCeilY, ceilYClamp, floorYClamp);
+                    int portalFloorYClamp = clamp((int) portalFloorY, ceilYClamp, floorYClamp);
 
                     // Wall above portal
                     vLine(g, x, ceilYClamp, portalCeilYClamp, Color.WHITE);
@@ -377,6 +381,7 @@ public class Renderer {
                 (float) (((point.y - player.location.y) * Math.cos(rAngle)) + ((point.x - player.location.x) * Math.sin(rAngle))));
     }
 
+    @SuppressWarnings("SuspiciousNameCombination")
     public Vec2f getIntersect(Vec2f p1, Vec2f p2, Vec2f p3, Vec2f p4) {
         float x = fNCross(p1, p2);
         float y = fNCross(p3, p4);
@@ -431,11 +436,23 @@ public class Renderer {
     }
 
     public Vec2f screenToFloor(float x, float y, float floorHeight) {
-
         float yOut = this.vFov * floorHeight / y;
-        float xOut = x * y / this.hFov;
+        float xOut = x * yOut / this.hFov;
 
         return new Vec2f(xOut,yOut);
+    }
+
+    public void floorVLine(Graphics g, int x, int y1, int y2, float floorHeight) {
+        float scale = 20;
+        for (int y = y1; y <= y2; y++) {
+            Vec2f worldPos = screenToFloor((float) x - (float)width/2, (float) y - (float)height/2, floorHeight);
+            if (Math.abs(worldPos.x/scale) < 1 && Math.abs(worldPos.y/scale) < 1) {
+                g.setColor(Color.getHSBColor(Math.abs(worldPos.x)/scale, 1, Math.abs(worldPos.y)/scale));
+            } else {
+                g.setColor(Color.BLUE);
+            }
+            g.drawLine(x,y,x,y);
+        }
     }
 
     public void vLine(Graphics g, int x, int y1, int y2, Color color) {
