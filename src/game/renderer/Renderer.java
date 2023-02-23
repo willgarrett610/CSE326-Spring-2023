@@ -289,6 +289,7 @@ public class Renderer {
                 if (portalSector == null) {
                     // Wall line
                     imgVline(g, x, ceilYClamp, floorYClamp, tx, ty, th, wall);
+                    //vLine(g, x, ceilYClamp, floorYClamp, Color.GREEN);
                 }
                 // Floor line
                 vLine(g, x, floorYClamp, yBottom[x], Color.BLUE);
@@ -395,6 +396,10 @@ public class Renderer {
         return n < min ? min : Math.min(max, n);
     }
 
+    //x - x screen pos [-400,400]
+    //p1 - first x and y coordinate (top down view) (y axis is player's mid view)
+    //p2 - second x and y coordinate
+
     public Vec2f screenToWall(float x, Vec2f p1, Vec2f p2) {
         Vec2f left = p1;
         Vec2f right = p2;
@@ -421,6 +426,14 @@ public class Renderer {
 
         float xOut = -bw / (mw - mr);
         float yOut = mr * xOut;
+
+        return new Vec2f(xOut,yOut);
+    }
+
+    public Vec2f screenToFloor(float x, float y, float floorHeight) {
+
+        float yOut = this.vFov * floorHeight / y;
+        float xOut = x * y / this.hFov;
 
         return new Vec2f(xOut,yOut);
     }
