@@ -66,7 +66,7 @@ public class Renderer {
         //	public int leftX:	left side of where sector can be seen on screen
         //	public int rightX;	right side of where sector can be seen on screen
         Queue<QueueItem> renderQueue = new LinkedList<>();
-        renderQueue.add(new QueueItem(player.sector, -2, 0, width-1));
+        renderQueue.add(new QueueItem(playerSector, -2, 0, width-1));
 
         QueueItem head;
         while ((head = renderQueue.poll()) != null) {
@@ -85,7 +85,7 @@ public class Renderer {
                 break;
         }
 
-        BufferedImage map = renderMap(player.angle);
+        BufferedImage map = renderMap(playerAngle);
         g.drawImage(map, 0, 0, null);
 
         g.dispose();
@@ -112,8 +112,8 @@ public class Renderer {
         for (int i = 0; i < sector.vertices.length; i++) {
             // p1Trans is the vertex to the left of the current vertex index.
             // Since the index to the left of i = 0 would be -1, we wrap around and use the last vertex instead.
-            Vec2f p1Trans = relativePoint(world.vertices.get(sector.vertices[(i == 0 ? sector.vertices.length : i) - 1]), playerAngle);
-            Vec2f p2Trans = relativePoint(world.vertices.get(sector.vertices[i]), playerAngle);
+            Vec2f p1Trans = relativePoint(world.vertices.get(sector.vertices[(i == 0 ? sector.vertices.length : i) - 1]), playerAngle, playerLocation);
+            Vec2f p2Trans = relativePoint(world.vertices.get(sector.vertices[i]), playerAngle, playerLocation);
 
             // Check if wall is within field of view
             //
@@ -331,6 +331,7 @@ public class Renderer {
 
     public BufferedImage renderMap(float angle) {
         World world = player.world;
+        Vec2f location = player.location;
 
         // Create the map image
         BufferedImage map = new BufferedImage((int) (width * mapSize),(int) (height * mapSize), BufferedImage.TYPE_INT_ARGB);
@@ -348,7 +349,7 @@ public class Renderer {
         int[] ys = new int[playerSector.vertices.length];
         for (int i = 0; i < playerSector.vertices.length; i++) {
             Vec2f vert = world.vertices.get(playerSector.vertices[i]);
-            vert = relativePoint(vert, angle);
+            vert = relativePoint(vert, angle, location);
             xs[i] = (int) (vert.x * mapSize * mapZoom) + midP.x;
             ys[i] = (int) (-vert.y * mapSize * mapZoom) + midP.y;
         }
@@ -358,8 +359,8 @@ public class Renderer {
         mapG.setColor(Color.YELLOW);
         for (Sector sector : world.sectors) {
             for (int i = 0; i < sector.vertices.length; i++) {
-                Vec2f p1Trans = relativePoint(world.vertices.get(sector.vertices[(i == 0 ? sector.vertices.length : i) - 1]), angle);
-                Vec2f p2Trans = relativePoint(world.vertices.get(sector.vertices[i]), angle);
+                Vec2f p1Trans = relativePoint(world.vertices.get(sector.vertices[(i == 0 ? sector.vertices.length : i) - 1]), angle, location);
+                Vec2f p2Trans = relativePoint(world.vertices.get(sector.vertices[i]), angle, location);
                 mapG.drawLine((int) (p1Trans.x * mapSize * mapZoom) + midP.x, (int) (-p1Trans.y * mapSize * mapZoom) + midP.y, (int) (p2Trans.x * mapSize * mapZoom) + midP.x, (int) (-p2Trans.y * mapSize * mapZoom) + midP.y);
             }
         }
@@ -378,10 +379,10 @@ public class Renderer {
         return map;
     }
 
-    public Vec2f relativePoint(Vec2f point, float angle) {
+    public Vec2f relativePoint(Vec2f point, float angle, Vec2f location) {
         double rAngle = Math.toRadians(angle);
-        return new Vec2f((float) (((point.x - player.location.x) * Math.cos(rAngle)) - ((point.y - player.location.y) * Math.sin(rAngle))),
-                (float) (((point.y - player.location.y) * Math.cos(rAngle)) + ((point.x - player.location.x) * Math.sin(rAngle))));
+        return new Vec2f((float) (((point.x - location.x) * Math.cos(rAngle)) - ((point.y - location.y) * Math.sin(rAngle))),
+                (float) (((point.y - location.y) * Math.cos(rAngle)) + ((point.x - location.x) * Math.sin(rAngle))));
     }
 
     public Vec2f worldPoint(Vec2f point, float angle, Vec2f pos) {
