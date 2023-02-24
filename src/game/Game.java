@@ -67,14 +67,16 @@ public class Game {
         BufferStrategy bs = frame.getBufferStrategy();
         long lastUpdate = System.currentTimeMillis();
         renderer = new Renderer(player, width, height);
+        boolean paused = false;
         while(true) {
             // Remain withing frame-rate cap
-            if (System.currentTimeMillis() - lastUpdate >= 1000 / FPS) {
+            paused = inputs.pauseButton(paused, frame);
+            if ((System.currentTimeMillis() - lastUpdate >= 1000 / FPS) & !paused) {
                 renderer.render(bs);
                 lastUpdate = System.currentTimeMillis();
                 inputs.checkInput();
             }
+
         }
     }
-
 }

@@ -3,7 +3,6 @@ package game.input;
 import game.settings.Settings;
 import game.world.Player;
 import game.world.Vec2f;
-import game.world.World;
 
 import javax.swing.*;
 import java.awt.*;
@@ -71,6 +70,22 @@ public class InputListener implements KeyListener, MouseMotionListener {
         }
 
         player.move(moveTo);
+    }
+
+    public boolean pauseButton(boolean paused, JFrame frame) {
+        var pauseIcon = new ImageIcon("res/wall.png");
+        var pauseLabel = new JLabel(pauseIcon);
+        //System.out.println(KeyEvent.KEY_PRESSED);
+        if (paused & isPressed('P')) {
+            frame.add(pauseLabel);
+            System.out.println("unpaused");
+            return false;
+        } else if (!paused & isPressed('P')) {
+            frame.remove(pauseLabel);
+            System.out.println("paused");
+            return true;
+        }
+        return paused;
     }
 
     @Override
