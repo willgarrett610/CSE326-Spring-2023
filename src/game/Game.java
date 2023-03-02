@@ -15,7 +15,7 @@ import java.io.FileNotFoundException;
 
 public class Game {
 
-    static final int FPS = 60;
+    static final int FPS = 120;
 
     static final int width = 800;
     static final int height = 800;
@@ -77,15 +77,22 @@ public class Game {
         while(true) {
             // Remain withing frame-rate cap
             paused = inputs.pauseButton(paused, frame);
-            if ((System.currentTimeMillis() - lastUpdate >= 1000 / FPS) & !paused) {
+            long timeElapsed = System.currentTimeMillis() - lastUpdate;
+            if ((timeElapsed >= 1000 / FPS) & !paused) {
+                lastUpdate = System.currentTimeMillis();
                 renderer.render();
-                for(int i = 0; i < width * height; i++)
-                    screen[i] = renderer.screen[i];
+                System.arraycopy(renderer.screen, 0, screen, 0, width * height);
+
                 Graphics g = bufStrat.getDrawGraphics();
                 g.drawImage(buf, 0, 0, null);
+
+                int realFPS = Math.round(1000f / (float)timeElapsed);
+                g.setColor(Color.BLACK);
+                g.setFont(new Font("Arial", Font.PLAIN, 16));
+                g.drawString("FPS: " + realFPS, 710, 50);
+
                 bufStrat.show();
                 g.dispose();
-                lastUpdate = System.currentTimeMillis();
                 inputs.checkInput();
             }
 
