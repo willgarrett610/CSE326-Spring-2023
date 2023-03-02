@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.FileNotFoundException;
 
 public class Game {
@@ -26,6 +27,9 @@ public class Game {
     private InputListener inputs;
 
     public Renderer renderer;
+
+    private BufferedImage buf;
+    private int screen[];
 
     public static void main(String[] args) {
         Game game = new Game();
@@ -64,7 +68,9 @@ public class Game {
     }
 
     public void startLoop() {
-        BufferStrategy bs = frame.getBufferStrategy();
+        BufferStrategy bufStrat = frame.getBufferStrategy();
+        buf = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        screen = ((DataBufferInt) (buf.getRaster().getDataBuffer())).getData();
         long lastUpdate = System.currentTimeMillis();
         renderer = new Renderer(player, width, height);
         boolean paused = false;
@@ -72,7 +78,13 @@ public class Game {
             // Remain withing frame-rate cap
             paused = inputs.pauseButton(paused, frame);
             if ((System.currentTimeMillis() - lastUpdate >= 1000 / FPS) & !paused) {
-                renderer.render(bs);
+                renderer.render();
+                for(int i = 0; i < width * height; i++)
+                    screen[i] = renderer.screen[i];
+                Graphics g = bufStrat.getDrawGraphics();
+                g.drawImage(buf, 0, 0, null);
+                bufStrat.show();
+                g.dispose();
                 lastUpdate = System.currentTimeMillis();
                 inputs.checkInput();
             }

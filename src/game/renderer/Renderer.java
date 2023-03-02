@@ -35,19 +35,20 @@ public class Renderer {
 
     BufferedImage wall;
 
+    public int screen[];
+
     public Renderer(Player player, int width, int height) {
         this.player = player;
         this.width = width;
         this.height = height;
         this.hFov = 0.73f*height;
         this.vFov = 0.73f*height;
+        this.screen = new int[width * height];
 
-        wall = ResourceLoader.loadImage("wall.png");
+        wall = ResourceLoader.loadImage("steel panel.png");
     }
 
-    public void render(BufferStrategy bs) {
-        Graphics g = bs.getDrawGraphics();
-
+    public void render() {
         World world = player.world;
 
         float playerAngle = player.angle;
@@ -72,7 +73,7 @@ public class Renderer {
         while ((head = renderQueue.poll()) != null) {
             Sector sector = world.sectors.get(head.sector);
 
-            renderQueue.addAll(renderSector(g, playerAngle, playerLocation, playerSector, world, sector, head, yTop, yBottom));
+            renderQueue.addAll(renderSector(playerAngle, playerLocation, playerSector, world, sector, head, yTop, yBottom));
 
             boolean complete = true;
             for (int i = 0; i < width; i++) {
@@ -86,14 +87,10 @@ public class Renderer {
         }
 
         BufferedImage map = renderMap(playerAngle);
-        g.drawImage(map, 0, 0, null);
-
-        g.dispose();
-        bs.show();
+        //g.drawImage(map, 0, 0, null);
     }
 
     public List<QueueItem> renderSector(
-            Graphics g,
             float playerAngle,
             Vec2f playerLocation,
             int playerSectorI,
@@ -289,16 +286,16 @@ public class Renderer {
                 // Draw vertical lines to fill wall
 
                 // Ceiling line
-                vLine(g, x, yTop[x], ceilYClamp, Color.DARK_GRAY);
+                vLine(x, yTop[x], ceilYClamp, Color.DARK_GRAY.getRGB());
                 if (portalSector == null) {
                     // Wall line
-                    imgVline(g, x, ceilYClamp, floorYClamp, tx, ty, th, wall);
+                    imgVline(x, ceilYClamp, floorYClamp, tx, ty, th, wall);
                     //vLine(g, x, ceilYClamp, floorYClamp, Color.GREEN);
                 }
                 // Floor line
                 Vec2f bottomLeft = new Vec2f(0,0);
                 Vec2f upperRight = new Vec2f(20,20);
-                floorVLine(g, x, floorYClamp, yBottom[x], bottomLeft, upperRight, relFloorHeight, playerAngle, playerLocation);
+                floorVLine(x, floorYClamp, yBottom[x], bottomLeft, upperRight, relFloorHeight, playerAngle, playerLocation);
 //                vLine(g, x, floorYClamp, yBottom[x], Color.BLUE);
 
                 yTop[x] = 0;
@@ -311,9 +308,9 @@ public class Renderer {
                     int portalFloorYClamp = clamp((int) portalFloorY, ceilYClamp, floorYClamp);
 
                     // Wall above portal
-                    vLine(g, x, ceilYClamp, portalCeilYClamp, Color.WHITE);
+                    vLine(x, ceilYClamp, portalCeilYClamp, 0xffffff);
                     // Wall below portal
-                    vLine(g, x, portalFloorYClamp, floorYClamp, Color.WHITE);
+                    vLine(x, portalFloorYClamp, floorYClamp, 0xffffff);
 
                     // Update available draw area
                     yTop[x] = portalCeilYClamp;
@@ -322,7 +319,7 @@ public class Renderer {
 
                 // Black wireframes
                 if (x == leftX || x == rightX)
-                    vLine(g, x, ceilYClamp, floorYClamp, Color.BLACK);
+                    vLine(x, ceilYClamp, floorYClamp, 0);
             }
         }
 
@@ -452,28 +449,26 @@ public class Renderer {
         return worldPoint(new Vec2f(xOut,yOut), angle, pos);
     }
 
-    public void floorVLine(Graphics g, int x, int y1, int y2, Vec2f bl, Vec2f ur, float floorHeight, float angle, Vec2f pos) {
+    public void floorVLine(int x, int y1, int y2, Vec2f bl, Vec2f ur, float floorHeight, float angle, Vec2f pos) {
         float scale = 20;
         for (int y = y1; y <= y2; y++) {
                 Vec2f worldPos = screenToFloor((float) x - (float) width / 2, (float) y - (float) height / 2, floorHeight, angle, pos);
                 int iX = (int) Math.abs(Math.floor(wall.getWidth() * (worldPos.x - bl.x) / (ur.x - bl.x))) % wall.getWidth();
                 int iY = (int) Math.abs(Math.floor(wall.getHeight() * (worldPos.y - bl.y) / (ur.y - bl.y))) % wall.getHeight();
-                g.setColor(intToColor(wall.getRGB(iX, iY)));
+                screen[x + y * width] = wall.getRGB(iX, iY);
                 //if (Math.abs(worldPos.x/scale) < 1 && Math.abs(worldPos.y/scale) < 1) {
                 //    g.setColor(Color.getHSBColor(Math.abs(worldPos.x)/scale, 1, Math.abs(worldPos.y)/scale));
                 //} else {
                 //    g.setColor(Color.BLUE);
                 //}
-                g.drawLine(x, y, x, y);
         }
     }
 
-    public void vLine(Graphics g, int x, int y1, int y2, Color color) {
-        g.setColor(color);
-        g.fillRect(x, y1, 1, y2 - y1);
-        g.setColor(Color.BLACK);
-        g.fillRect(x,y1,1,1);
-        g.fillRect(x,y2,1,1);
+    public void vLine(int x, int y1, int y2, int color) {
+        for(int y = y1; y < y2; y++)
+            screen[x + y * width] = color;
+        screen[x + y1 * width] = 0;
+        screen[x + y2 * width] = 0;
     }
 
     public Color intToColor(int color) {
@@ -483,7 +478,7 @@ public class Renderer {
         return new Color(r,g,b);
     }
 
-    public void imgVline(Graphics g, int x, int y1, int y2, double tx, double ty, double th, BufferedImage image) {
+    public void imgVline(int x, int y1, int y2, double tx, double ty, double th, BufferedImage image) {
         if (th == 0)
             return;
 
@@ -498,8 +493,7 @@ public class Renderer {
             int iY = (int)Math.floor(tYNew * image.getHeight()) % image.getHeight();
 
             // Sample pixel from image and draw to screen
-            g.setColor(intToColor(wall.getRGB(iX, iY)));
-            g.drawLine(x, y, x, y);
+            screen[x + y * width] = wall.getRGB(iX, iY);
         }
     }
 
