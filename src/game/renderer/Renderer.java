@@ -9,6 +9,8 @@ import game.world.World;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.awt.image.Raster;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -87,6 +89,11 @@ public class Renderer {
         }
 
         BufferedImage map = renderMap(playerAngle);
+        for (int x = 0; x < map.getWidth(); x++) {
+            for (int y = 0; y < map.getHeight(); y++) {
+                this.screen[x + y * width] = map.getRGB(x,y);
+            }
+        }
         //g.drawImage(map, 0, 0, null);
     }
 
