@@ -47,7 +47,7 @@ public class Renderer {
         this.vFov = 0.73f*height;
         this.screen = new int[width * height];
 
-        wall = ResourceLoader.loadImage("steel panel.png");
+        wall = ResourceLoader.loadImage("wall_steel.png");
     }
 
     public void render() {
@@ -500,7 +500,21 @@ public class Renderer {
             int iY = (int)Math.floor(tYNew * image.getHeight()) % image.getHeight();
 
             // Sample pixel from image and draw to screen
-            screen[x + y * width] = wall.getRGB(iX, iY);
+            Color c = new Color(wall.getRGB(iX, iY), true);
+            if(c.getAlpha() < 255) {
+                double alpha = c.getAlpha() / 255.0;
+                // calculate new color using rgba channels individually
+                Color rgb = intToColor(screen[x + y * width]);
+                int red = rgb.getRed();
+                int green = rgb.getGreen();
+                int blue = rgb.getBlue();
+                int r = (int) (red * (1 - alpha) + c.getRed() * alpha);
+                int g = (int) (green * (1 - alpha) + c.getGreen() * alpha);
+                int b = (int) (blue * (1 - alpha) + c.getBlue() * alpha);
+                screen[x + y * width] = (new Color(r, g, b)).getRGB();
+            }
+            else
+                screen[x + y * width] = wall.getRGB(iX, iY);
         }
     }
 
