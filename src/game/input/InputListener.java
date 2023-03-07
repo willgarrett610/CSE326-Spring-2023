@@ -17,6 +17,7 @@ public class InputListener implements KeyListener, MouseMotionListener {
 
     // List of currently held keys
     List<Integer> keys;
+    public List<Integer> keys_push;
 
     // Current mouse position
     Point mouse;
@@ -33,6 +34,9 @@ public class InputListener implements KeyListener, MouseMotionListener {
     public InputListener(Player player, JFrame frame) throws AWTException {
         this.keys = new ArrayList<>();
         this.keys = new ArrayList<>();
+
+        this.keys_push = new ArrayList<>();
+
         this.player = player;
         this.frame = frame;
         robot = new Robot();
@@ -73,15 +77,15 @@ public class InputListener implements KeyListener, MouseMotionListener {
     }
 
     public boolean pauseButton(boolean paused, JFrame frame) {
-        var pauseIcon = new ImageIcon("res/wall.png");
-        var pauseLabel = new JLabel(pauseIcon);
+        //var pauseIcon = new ImageIcon("res/wall.png");
+        //var pauseLabel = new JLabel(pauseIcon);
         //System.out.println(KeyEvent.KEY_PRESSED);
-        if (paused & isPressed('P')) {
-            frame.add(pauseLabel);
+        if (paused & keys_push.contains(80)) {
+            //frame.add(pauseLabel);
             System.out.println("unpaused");
             return false;
-        } else if (!paused & isPressed('P')) {
-            frame.remove(pauseLabel);
+        } else if (!paused & keys_push.contains(80)) {
+            //frame.remove(pauseLabel);
             System.out.println("paused");
             return true;
         }
@@ -95,13 +99,26 @@ public class InputListener implements KeyListener, MouseMotionListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        isPushed(e);
+
         if (!keys.contains(e.getKeyCode()))
             keys.add(e.getKeyCode());
+    }
+
+    public void isPushed (KeyEvent e) {
+        if (keys.contains(e.getKeyCode())){
+            keys_push.clear();
+            //System.out.println(keys_push);
+        } else if (!keys_push.contains(e.getKeyCode()) & !keys.contains(e.getKeyCode())){
+            keys_push.add(e.getKeyCode());
+            //System.out.println(keys_push);
+        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         keys.remove((Integer) e.getKeyCode());
+        keys_push.clear();
     }
 
     @Override

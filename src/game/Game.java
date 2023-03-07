@@ -76,7 +76,7 @@ public class Game {
         boolean paused = false;
         while(true) {
             // Remain withing frame-rate cap
-            paused = inputs.pauseButton(paused, frame);
+
             long timeElapsed = System.currentTimeMillis() - lastUpdate;
             if ((timeElapsed >= 1000 / FPS) & !paused) {
                 lastUpdate = System.currentTimeMillis();
@@ -95,7 +95,8 @@ public class Game {
                 g.dispose();
                 inputs.checkInput();
             }
-
+            paused = inputs.pauseButton(paused, frame);
+            inputs.keys_push.clear();
         }
     }
 }
