@@ -191,7 +191,7 @@ public class Renderer {
             Sector portalSector = null;
 
             // Check if this wall contains a portal to another sector
-            if (sector.sectors[i] != -1) {
+            if (sector.sectors[i] != -1 || hasAlpha(world.textures.get(sector.textures[i])) == 1) {
                 // Get sector that portal points to
                 portalSector = world.sectors.get(sector.sectors[i]);
 
@@ -458,8 +458,8 @@ public class Renderer {
         float scale = 20;
         for (int y = y1; y <= y2; y++) {
                 Vec2f worldPos = screenToFloor((float) x - (float) width / 2, (float) y - (float) height / 2, floorHeight, angle, pos);
-                int iX = (int) Math.abs(Math.floor(texture.getWidth() * (worldPos.x - bl.x) / (ur.x - bl.x))) % texture.getWidth();
-                int iY = (int) Math.abs(Math.floor(texture.getHeight() * (worldPos.y - bl.y) / (ur.y - bl.y))) % texture.getHeight();
+                int iX = (int) (Math.abs(Math.floor(texture.getWidth() * (worldPos.x - bl.x) / (ur.x - bl.x))) / scale % texture.getWidth());
+                int iY = (int) (Math.abs(Math.floor(texture.getHeight() * (worldPos.y - bl.y) / (ur.y - bl.y))) / scale % texture.getHeight());
                 screen[x + y * width] = texture.getRGB(iX, iY);
                 //if (Math.abs(worldPos.x/scale) < 1 && Math.abs(worldPos.y/scale) < 1) {
                 //    g.setColor(Color.getHSBColor(Math.abs(worldPos.x)/scale, 1, Math.abs(worldPos.y)/scale));
@@ -483,6 +483,16 @@ public class Renderer {
         return new Color(r,g,b);
     }
 
+    public int hasAlpha(BufferedImage image) {
+        for(int iX = 0; iX < image.getWidth(); iX++)
+            for(int iY = 0; iY < image.getHeight(); iY++) {
+                Color c = new Color(image.getRGB(iX, iY), true);
+                if (c.getAlpha() < 255)
+                    return 1;
+            }
+        return 0;
+    }
+
     public void imgVline(int x, int y1, int y2, double tx, double ty, double th, BufferedImage image) {
         if (th == 0)
             return;
@@ -499,7 +509,9 @@ public class Renderer {
 
             // Sample pixel from image and draw to screen
             Color c = new Color(image.getRGB(iX, iY), true);
-            if(c.getAlpha() < 255) {
+            if(c.getAlpha() == 255)
+                screen[x + y * width] = image.getRGB(iX, iY);
+            else if (c.getAlpha() > 0) {
                 double alpha = c.getAlpha() / 255.0;
                 // calculate new color using rgba channels individually
                 Color rgb = intToColor(screen[x + y * width]);
@@ -511,8 +523,6 @@ public class Renderer {
                 int b = (int) (blue * (1 - alpha) + c.getBlue() * alpha);
                 screen[x + y * width] = (new Color(r, g, b)).getRGB();
             }
-            else
-                screen[x + y * width] = image.getRGB(iX, iY);
         }
     }
 
