@@ -1,17 +1,21 @@
 package game.world;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 
-public class World {public List<Vec2f> vertices;
+public class World {
+    public List<Vec2f> vertices;
     public List<Sector> sectors;
+    public List<BufferedImage> textures;
 
     Vec2f startLocation;
     float startAngle;
     int startSector;
 
-    public World(List<Vec2f> vertices, List<Sector> sectors, Vec2f startLocation, float startAngle, int startSector) {
+    public World(List<Vec2f> vertices, List<Sector> sectors, List<BufferedImage> textures, Vec2f startLocation, float startAngle, int startSector) {
         this.vertices = vertices;
         this.sectors = sectors;
+        this.textures = textures;
 
         this.startLocation = startLocation;
         this.startAngle = startAngle;

@@ -35,8 +35,6 @@ public class Renderer {
     float textureHeight = 20;
     float textureWidth = 20;
 
-    BufferedImage wall;
-
     public int screen[];
 
     public Renderer(Player player, int width, int height) {
@@ -46,8 +44,6 @@ public class Renderer {
         this.hFov = 0.73f*height;
         this.vFov = 0.73f*height;
         this.screen = new int[width * height];
-
-        wall = ResourceLoader.loadImage("wall_steel.png");
     }
 
     public void render() {
@@ -296,7 +292,7 @@ public class Renderer {
                 vLine(x, yTop[x], ceilYClamp, Color.DARK_GRAY.getRGB());
                 if (portalSector == null) {
                     // Wall line
-                    imgVline(x, ceilYClamp, floorYClamp, tx, ty, th, wall);
+                    imgVline(x, ceilYClamp, floorYClamp, tx, ty, th, world.textures.get(sector.textures[i]));
                     //vLine(g, x, ceilYClamp, floorYClamp, Color.GREEN);
                 }
                 // Floor line
@@ -457,12 +453,14 @@ public class Renderer {
     }
 
     public void floorVLine(int x, int y1, int y2, Vec2f bl, Vec2f ur, float floorHeight, float angle, Vec2f pos) {
+        BufferedImage texture = player.world.textures.get(0);
+
         float scale = 20;
         for (int y = y1; y <= y2; y++) {
                 Vec2f worldPos = screenToFloor((float) x - (float) width / 2, (float) y - (float) height / 2, floorHeight, angle, pos);
-                int iX = (int) Math.abs(Math.floor(wall.getWidth() * (worldPos.x - bl.x) / (ur.x - bl.x))) % wall.getWidth();
-                int iY = (int) Math.abs(Math.floor(wall.getHeight() * (worldPos.y - bl.y) / (ur.y - bl.y))) % wall.getHeight();
-                screen[x + y * width] = wall.getRGB(iX, iY);
+                int iX = (int) Math.abs(Math.floor(texture.getWidth() * (worldPos.x - bl.x) / (ur.x - bl.x))) % texture.getWidth();
+                int iY = (int) Math.abs(Math.floor(texture.getHeight() * (worldPos.y - bl.y) / (ur.y - bl.y))) % texture.getHeight();
+                screen[x + y * width] = texture.getRGB(iX, iY);
                 //if (Math.abs(worldPos.x/scale) < 1 && Math.abs(worldPos.y/scale) < 1) {
                 //    g.setColor(Color.getHSBColor(Math.abs(worldPos.x)/scale, 1, Math.abs(worldPos.y)/scale));
                 //} else {
@@ -500,7 +498,7 @@ public class Renderer {
             int iY = (int)Math.floor(tYNew * image.getHeight()) % image.getHeight();
 
             // Sample pixel from image and draw to screen
-            Color c = new Color(wall.getRGB(iX, iY), true);
+            Color c = new Color(image.getRGB(iX, iY), true);
             if(c.getAlpha() < 255) {
                 double alpha = c.getAlpha() / 255.0;
                 // calculate new color using rgba channels individually
@@ -514,7 +512,7 @@ public class Renderer {
                 screen[x + y * width] = (new Color(r, g, b)).getRGB();
             }
             else
-                screen[x + y * width] = wall.getRGB(iX, iY);
+                screen[x + y * width] = image.getRGB(iX, iY);
         }
     }
 

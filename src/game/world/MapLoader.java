@@ -1,5 +1,8 @@
 package game.world;
 
+import game.ResourceLoader;
+
+import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -11,6 +14,7 @@ public class MapLoader {
     public static World load(String mapName) {
         List<Vec2f> vertices = new ArrayList<>();
         List<Sector> sectors = new ArrayList<>();
+        List<BufferedImage> textures = new ArrayList<>();
         Vec2f playerLocation = null;
         float playerAngle = 0;
         int playerSector = 0;
@@ -29,19 +33,28 @@ public class MapLoader {
                 for (int i = 1; i < nums.length; i++) {
                     vertices.add(new Vec2f(Float.parseFloat(nums[i]), Float.parseFloat(nums[0])));
                 }
+            } else if (line.startsWith("texture")) {
+                line = line.replaceAll("texture[ ]+", "");
+                String[] args = line.split("[ ]+");
+                String fileName = args[0];
+
+                BufferedImage img = ResourceLoader.loadImage(fileName);
+                textures.add(img);
             } else if (line.startsWith("sector")) {
                 line = line.replaceAll("sector[ ]+", "");
                 String[] nums = line.split("[ ]+");
                 float floorHeight = Float.parseFloat(nums[0]);
                 float ceilHeight = Float.parseFloat(nums[1]);
-                int vertexNum = (nums.length - 2) / 2;
+                int vertexNum = (nums.length - 2) / 3;
                 int[] sVertices = new int[vertexNum];
                 int[] sSectors = new int[vertexNum];
+                int[] sTextures = new int[vertexNum];
                 for (int i = 0; i < vertexNum; i++) {
                     sVertices[i] = Integer.parseInt(nums[i + 2]);
                     sSectors[i] = Integer.parseInt(nums[i + 2 + vertexNum]);
+                    sTextures[i] = Integer.parseInt(nums[i + 2 + vertexNum * 2]);
                 }
-                Sector sector = new Sector(floorHeight, ceilHeight, sVertices, sSectors);
+                Sector sector = new Sector(floorHeight, ceilHeight, sVertices, sSectors, sTextures);
                 sectors.add(sector);
             } else if (line.startsWith("player")) {
                 line = line.replaceAll("player[ ]+", "");
@@ -52,7 +65,7 @@ public class MapLoader {
             }
         }
         in.close();
-        return new World(vertices, sectors, playerLocation, playerAngle, playerSector);
+        return new World(vertices, sectors, textures, playerLocation, playerAngle, playerSector);
     }
 
 }
