@@ -13,14 +13,12 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.FileNotFoundException;
 
-public class Game {
+public class Game extends JFrame {
 
     static final int FPS = 120;
 
     static final int width = 800;
     static final int height = 800;
-
-    private JFrame frame;
 
     private Player player;
 
@@ -37,20 +35,20 @@ public class Game {
     }
 
     private Game() {
-        frame = new JFrame("Moom Doon");
-        frame.setSize(width, height);
-        frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        super("Moom Doon");
+        this.setSize(width, height);
+        this.setResizable(false);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // Center window in monitor
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-        frame.createBufferStrategy(2);
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+        this.createBufferStrategy(2);
 
         // Remove cursor on window
         BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
         Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
                 cursorImg, new Point(0, 0), "blank cursor");
-        frame.getContentPane().setCursor(blankCursor);
+        this.getContentPane().setCursor(blankCursor);
 
         // Load map
         World world = null;
@@ -59,16 +57,16 @@ public class Game {
         player = new Player(world);
 
         try {
-            inputs = new InputListener(player, frame);
+            inputs = new InputListener(player, this);
         } catch (AWTException e) {
             System.exit(0);
         }
-        frame.addKeyListener(inputs);
-        frame.addMouseMotionListener(inputs);
+        this.addKeyListener(inputs);
+        this.addMouseMotionListener(inputs);
     }
 
     public void startLoop() {
-        BufferStrategy bufStrat = frame.getBufferStrategy();
+        BufferStrategy bufStrat = this.getBufferStrategy();
         buf = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         screen = ((DataBufferInt) (buf.getRaster().getDataBuffer())).getData();
         long lastUpdate = System.currentTimeMillis();
@@ -95,7 +93,7 @@ public class Game {
                 g.dispose();
                 inputs.checkInput();
             }
-            paused = inputs.pauseButton(paused, frame);
+            paused = inputs.pauseButton(paused, this);
             inputs.keys_push.clear();
         }
     }
