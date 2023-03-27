@@ -138,7 +138,10 @@ public class Game extends Canvas implements Runnable {
     }
 
     public void update() {
-        inputs.checkInput();
+        //Character cannot move if game is paused
+        if (!paused) {
+            inputs.checkInput();
+        }
         paused = inputs.pauseButton(paused, this.frame);
         inputs.keys_push.clear();
     }
@@ -161,9 +164,13 @@ public class Game extends Canvas implements Runnable {
                 lastUpdate = System.currentTimeMillis();
                 render(timeElapsed);
 
-                if (!loading) {
-                    update();
-                }
+            } else if ((timeElapsed >= 1000 / FPS) & paused) {
+                //Draws temporary pause image
+                drawImage(getBufferStrategy(), loadingImage,100, 100, 600, 600);
+            }
+
+            if ((timeElapsed >= 1000 / FPS) & !loading) {
+                update();
             }
         }
     }

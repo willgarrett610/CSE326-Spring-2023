@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,10 +82,21 @@ public class InputListener implements KeyListener, MouseMotionListener {
         //System.out.println(KeyEvent.KEY_PRESSED);
         if (paused & keys_push.contains(80)) {
             //frame.add(pauseLabel);
+
+            //Remove cursor
+            BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+            Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+                    cursorImg, new Point(0, 0), "blank cursor");
+            frame.getContentPane().setCursor(blankCursor);
+
             System.out.println("unpaused");
             return false;
         } else if (!paused & keys_push.contains(80)) {
             //frame.remove(pauseLabel);
+
+            //Return cursor
+            frame.getContentPane().setCursor(Cursor.getDefaultCursor());
+
             System.out.println("paused");
             return true;
         }
