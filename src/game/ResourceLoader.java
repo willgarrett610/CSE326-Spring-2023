@@ -15,7 +15,7 @@ public class ResourceLoader {
 
     public static BufferedImage loadImage(String name) {
         Image img = new ImageIcon(getPath(name)).getImage();
-        BufferedImage bImg = new BufferedImage(img.getWidth(null),img.getHeight(null),BufferedImage.TRANSLUCENT);
+        BufferedImage bImg = new BufferedImage(img.getWidth(null),img.getHeight(null),BufferedImage.TYPE_INT_ARGB);
         bImg.getGraphics().drawImage(img, 0, 0, null);
 
         return bImg;

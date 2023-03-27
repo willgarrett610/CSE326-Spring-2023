@@ -1,5 +1,6 @@
 package game.input;
 
+import game.Game;
 import game.settings.Settings;
 import game.world.Player;
 import game.world.Vec2f;
@@ -23,22 +24,20 @@ public class InputListener implements KeyListener, MouseMotionListener {
     Point mouse;
     boolean ignoreNext;
 
-    Player player;
-    JFrame frame;
+    Game game;
 
     // Used to update the mouse position while player is turning
     Robot robot;
 
     static float movementSpeed = 1f;
 
-    public InputListener(Player player, JFrame frame) throws AWTException {
+    public InputListener(Game game) throws AWTException {
         this.keys = new ArrayList<>();
         this.keys = new ArrayList<>();
 
         this.keys_push = new ArrayList<>();
 
-        this.player = player;
-        this.frame = frame;
+        this.game = game;
         robot = new Robot();
     }
 
@@ -47,8 +46,8 @@ public class InputListener implements KeyListener, MouseMotionListener {
     }
 
     public void checkInput() {
-        double rAngle = Math.toRadians(player.angle);
-        Vec2f moveTo = new Vec2f(player.location.x,player.location.y);
+        double rAngle = Math.toRadians(game.player.angle);
+        Vec2f moveTo = new Vec2f(game.player.location.x,game.player.location.y);
         if (isPressed('A')) {
             moveTo.x -= Math.sin(rAngle + Math.toRadians(90)) * movementSpeed;
             moveTo.y -= Math.cos(rAngle + Math.toRadians(90)) * movementSpeed;
@@ -67,13 +66,13 @@ public class InputListener implements KeyListener, MouseMotionListener {
         }
 
         if (keys.contains(KeyEvent.VK_LEFT)) {
-            player.angle -= Settings.mouseSpeed;
+            game.player.angle -= Settings.mouseSpeed;
         }
         if (keys.contains(KeyEvent.VK_RIGHT)) {
-            player.angle += Settings.mouseSpeed;
+            game.player.angle += Settings.mouseSpeed;
         }
 
-        player.move(moveTo);
+        game.player.move(moveTo);
     }
 
     public boolean pauseButton(boolean paused, JFrame frame) {
@@ -99,6 +98,8 @@ public class InputListener implements KeyListener, MouseMotionListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (game.loading) return;
+
         isPushed(e);
 
         if (!keys.contains(e.getKeyCode()))
@@ -117,6 +118,8 @@ public class InputListener implements KeyListener, MouseMotionListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+        if (game.loading) return;
+
         keys.remove((Integer) e.getKeyCode());
         keys_push.clear();
     }
@@ -128,6 +131,8 @@ public class InputListener implements KeyListener, MouseMotionListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        if (game.loading) return;
+
         if (mouse == null || ignoreNext) {
             mouse = e.getPoint();
             ignoreNext = false;
@@ -135,29 +140,29 @@ public class InputListener implements KeyListener, MouseMotionListener {
         }
 
         if (e.getX() < mouse.getX()) {
-            player.angle -= (mouse.getX() - e.getX()) * Settings.mouseSpeed;
+            game.player.angle -= (mouse.getX() - e.getX()) * Settings.mouseSpeed;
         } else if(e.getX() > mouse.getX()) {
-            player.angle += (e.getX() - mouse.getX()) * Settings.mouseSpeed;
+            game.player.angle += (e.getX() - mouse.getX()) * Settings.mouseSpeed;
         }
 
         if (e.getX() < 100) {
             ignoreNext = true;
-            Point moveTo = new Point(frame.getLocationOnScreen().x + frame.getWidth() - 200, frame.getLocationOnScreen().y + e.getY());
+            Point moveTo = new Point(game.frame.getLocationOnScreen().x + game.frame.getWidth() - 200, game.frame.getLocationOnScreen().y + e.getY());
             robot.mouseMove(moveTo.x, moveTo.y);
             mouse = moveTo;
-        } else if (e.getX() > frame.getWidth() - 100) {
+        } else if (e.getX() > game.frame.getWidth() - 100) {
             ignoreNext = true;
-            Point moveTo = new Point(frame.getLocationOnScreen().x + 200, frame.getLocationOnScreen().y + e.getY());
+            Point moveTo = new Point(game.frame.getLocationOnScreen().x + 200, game.frame.getLocationOnScreen().y + e.getY());
             robot.mouseMove(moveTo.x, moveTo.y);
             mouse = moveTo;
         } else if (e.getY() < 100) {
             ignoreNext = true;
-            Point moveTo = new Point(frame.getLocationOnScreen().x + e.getX(), frame.getLocationOnScreen().y + frame.getHeight() - 200);
+            Point moveTo = new Point(game.frame.getLocationOnScreen().x + e.getX(), game.frame.getLocationOnScreen().y + game.frame.getHeight() - 200);
             robot.mouseMove(moveTo.x, moveTo.y);
             mouse = moveTo;
-        } else if (e.getY() > frame.getHeight() - 100) {
+        } else if (e.getY() > game.frame.getHeight() - 100) {
             ignoreNext = true;
-            Point moveTo = new Point(frame.getLocationOnScreen().x + e.getX(), frame.getLocationOnScreen().y + 200);
+            Point moveTo = new Point(game.frame.getLocationOnScreen().x + e.getX(), game.frame.getLocationOnScreen().y + 200);
             robot.mouseMove(moveTo.x, moveTo.y);
             mouse = moveTo;
         } else {

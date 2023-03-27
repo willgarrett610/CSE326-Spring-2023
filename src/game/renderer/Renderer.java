@@ -37,13 +37,16 @@ public class Renderer {
 
     public int screen[];
 
-    public Renderer(Player player, int width, int height) {
-        this.player = player;
+    public Renderer(int width, int height) {
         this.width = width;
         this.height = height;
         this.hFov = 0.73f*height;
         this.vFov = 0.73f*height;
         this.screen = new int[width * height];
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     public void render() {
@@ -484,12 +487,12 @@ public class Renderer {
     }
 
     public int hasAlpha(BufferedImage image) {
-        for(int iX = 0; iX < image.getWidth(); iX++)
-            for(int iY = 0; iY < image.getHeight(); iY++) {
-                Color c = new Color(image.getRGB(iX, iY), true);
-                if (c.getAlpha() < 255)
-                    return 1;
-            }
+//        for(int iX = 0; iX < image.getWidth(); iX++)
+//            for(int iY = 0; iY < image.getHeight(); iY++) {
+//                Color c = new Color(image.getRGB(iX, iY), true);
+//                if (c.getAlpha() < 255)
+//                    return 1;
+//            }
         return 0;
     }
 
