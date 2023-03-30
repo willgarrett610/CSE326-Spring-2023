@@ -7,13 +7,14 @@ import game.world.Vec2f;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
+import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+
+import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 
 public class InputListener implements KeyListener, MouseMotionListener {
 
@@ -80,6 +81,7 @@ public class InputListener implements KeyListener, MouseMotionListener {
         //var pauseIcon = new ImageIcon("res/wall.png");
         //var pauseLabel = new JLabel(pauseIcon);
         //System.out.println(KeyEvent.KEY_PRESSED);
+
         if (paused & keys_push.contains(80)) {
             //frame.add(pauseLabel);
 

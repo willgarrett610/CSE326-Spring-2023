@@ -1,6 +1,7 @@
 package game;
 
 import game.input.InputListener;
+import game.input.MouseListener;
 import game.renderer.Renderer;
 import game.world.MapLoader;
 import game.world.Player;
@@ -8,10 +9,14 @@ import game.world.World;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.FileNotFoundException;
+
+import java.util.Arrays;
 
 public class Game extends Canvas implements Runnable {
 
@@ -23,6 +28,8 @@ public class Game extends Canvas implements Runnable {
     public Player player;
 
     private InputListener inputs;
+
+    private MouseListener mouseinputs;
 
     public Renderer renderer;
 
@@ -74,8 +81,12 @@ public class Game extends Canvas implements Runnable {
             // TODO Give an error message
             System.exit(0);
         }
+
+        mouseinputs = new MouseListener();
+
         this.addKeyListener(inputs);
         this.addMouseMotionListener(inputs);
+        this.addMouseListener(mouseinputs);
 
         renderer = new Renderer(width, height);
         buf = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -144,6 +155,10 @@ public class Game extends Canvas implements Runnable {
         }
         paused = inputs.pauseButton(paused, this.frame);
         inputs.keys_push.clear();
+        if (mouseinputs.mouseClick != null) {
+            mouseinputs.mouseClick.x = 0;
+            mouseinputs.mouseClick.y = 0;
+        }
     }
 
     public synchronized void startLoop() {
@@ -156,6 +171,12 @@ public class Game extends Canvas implements Runnable {
     public void run() {
         long lastUpdate = System.currentTimeMillis();
 
+        JButton resumeButton = new JButton("floor_moon.png");
+        Box box = Box.createVerticalBox();
+        box.add(resumeButton);
+        this.frame.add(box);
+        box.grabFocus();
+
         while (running) {
             // Remain withing frame-rate cap
 
@@ -165,8 +186,15 @@ public class Game extends Canvas implements Runnable {
                 render(timeElapsed);
 
             } else if ((timeElapsed >= 1000 / FPS) & paused) {
-                //Draws temporary pause image
-                drawImage(getBufferStrategy(), loadingImage,100, 100, 600, 600);
+                //Draws temporary pause buttons
+                drawImage(getBufferStrategy(), loadingImage,200, 100, 400, 100);
+                drawImage(getBufferStrategy(), loadingImage,200, 210, 400, 100);
+                drawImage(getBufferStrategy(), loadingImage,200, 320, 400, 100);
+                drawImage(getBufferStrategy(), loadingImage,200, 430, 400, 100);
+                mouseinputs.pauseButtonCondition_resume(200, 100, 400, 100);
+                mouseinputs.pauseButtonCondition_settings(200, 210, 400, 100);
+                mouseinputs.pauseButtonCondition_exit(200, 320, 400, 100);
+                mouseinputs.pauseButtonCondition_quit(200, 430, 400, 100);
             }
 
             if ((timeElapsed >= 1000 / FPS) & !loading) {
