@@ -14,7 +14,9 @@ public class Player {
     public void move(Vec2f moveTo) {
         int i = 0;
         int exc = -1;
+        int ogSector = this.sector;
         int lastSector = this.sector;
+
         while ((i = wallCollision(moveTo, exc)) != -1) {
             if (i == -2 && this.sector != lastSector) {
                 exc = getPortalTo(lastSector);
@@ -46,6 +48,10 @@ public class Player {
                 x_pos += (float) Math.sqrt(buf / (1 + norm * norm)) * (x_pos - f) / Math.abs(x_pos - f); //shift buf units away from the wall
                 moveTo = new Vec2f(x_pos, norm * (f - x_pos) + g);
             }
+
+            this.sector = ogSector;
+            lastSector = this.sector;
+            exc = -1;
         }
 
         this.location = moveTo;
