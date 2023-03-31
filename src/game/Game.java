@@ -6,6 +6,7 @@ import game.renderer.Renderer;
 import game.world.MapLoader;
 import game.world.Player;
 import game.world.World;
+import game.world.entity.Enemy;
 
 import javax.swing.*;
 import java.awt.*;
@@ -96,6 +97,12 @@ public class Game extends Canvas implements Runnable {
         world = MapLoader.load("map.txt");
 
         player = new Player(world);
+
+        BufferedImage alien = ResourceLoader.loadImage("alien.jpg");
+
+        Enemy enemy = new Enemy(world, player.location, 1, player.sector, alien);
+
+        world.addEntity(enemy);
 
         renderer.setPlayer(player);
 

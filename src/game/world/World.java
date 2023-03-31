@@ -1,12 +1,16 @@
 package game.world;
 
+import game.world.entity.Entity;
+
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 public class World {
     public List<Vec2f> vertices;
     public List<Sector> sectors;
     public List<BufferedImage> textures;
+    public List<Entity> entities;
 
     Vec2f startLocation;
     float startAngle;
@@ -16,6 +20,7 @@ public class World {
         this.vertices = vertices;
         this.sectors = sectors;
         this.textures = textures;
+        this.entities = new ArrayList<>();
 
         this.startLocation = startLocation;
         this.startAngle = startAngle;
@@ -23,6 +28,14 @@ public class World {
 
         System.out.println("Vertices: \n" + vertices);
         System.out.println("Sectors: \n" + sectors);
+    }
+
+    public void addEntity(Entity entity) {
+        entities.add(entity);
+    }
+
+    public void removeEntity(Entity entity) {
+        entities.remove(entity);
     }
 
     public boolean onSegment(Vec2f p, Vec2f q, Vec2f r) {

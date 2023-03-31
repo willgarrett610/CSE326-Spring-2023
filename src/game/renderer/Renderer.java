@@ -5,6 +5,7 @@ import game.world.Player;
 import game.world.Sector;
 import game.world.Vec2f;
 import game.world.World;
+import game.world.entity.Entity;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -110,6 +111,14 @@ public class Renderer {
         Sector playerSector = world.sectors.get(playerSectorI);
 
         List<QueueItem> renderQueue = new ArrayList<>();
+
+        // Entities in this sector
+        List<Entity> entities = world.entities.stream()
+                .filter(e -> (e.getSector() == world.sectors.indexOf(sector)))
+                .toList();
+
+        // Render entities
+        // TODO: Figure out how to draw entities only in visible areas without interfering with wall rendering
 
         // Loop through each wall of the current sector
         for (int i = 0; i < sector.vertices.length; i++) {
