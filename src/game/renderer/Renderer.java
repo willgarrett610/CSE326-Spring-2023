@@ -194,7 +194,7 @@ public class Renderer {
             Sector portalSector = null;
 
             // Check if this wall contains a portal to another sector
-            if (sector.sectors[i] != -1 || hasAlpha(world.textures.get(sector.textures[i])) == 1) {
+            if (sector.sectors[i] != -1 /*|| hasAlpha(world.textures.get(sector.textures[i])) == 1*/) {
                 // Get sector that portal points to
                 portalSector = world.sectors.get(sector.sectors[i]);
 
