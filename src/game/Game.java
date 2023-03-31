@@ -9,14 +9,9 @@ import game.world.World;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.io.FileNotFoundException;
-
-import java.util.Arrays;
 
 public class Game extends Canvas implements Runnable {
 
@@ -46,6 +41,8 @@ public class Game extends Canvas implements Runnable {
 
     public boolean loading = true;
     boolean paused = false;
+
+    boolean inSettings = false;
 
     public static void main(String[] args) {
         Game game = new Game();
@@ -153,8 +150,9 @@ public class Game extends Canvas implements Runnable {
         if (!paused) {
             inputs.checkInput();
         }
-        paused = inputs.pauseButton(paused, this.frame);
+        paused = pauseButton(paused, this.frame);
         inputs.keys_push.clear();
+        mouseinputs.mouseclicked = false;
         if (mouseinputs.mouseClick != null) {
             mouseinputs.mouseClick.x = 0;
             mouseinputs.mouseClick.y = 0;
@@ -185,21 +183,84 @@ public class Game extends Canvas implements Runnable {
                 lastUpdate = System.currentTimeMillis();
                 render(timeElapsed);
 
-            } else if ((timeElapsed >= 1000 / FPS) & paused) {
-                //Draws temporary pause buttons
-                drawImage(getBufferStrategy(), loadingImage,200, 100, 400, 100);
-                drawImage(getBufferStrategy(), loadingImage,200, 210, 400, 100);
-                drawImage(getBufferStrategy(), loadingImage,200, 320, 400, 100);
-                drawImage(getBufferStrategy(), loadingImage,200, 430, 400, 100);
-                mouseinputs.pauseButtonCondition_resume(200, 100, 400, 100);
-                mouseinputs.pauseButtonCondition_settings(200, 210, 400, 100);
+            } else if (paused & !inSettings) {
+                paused = mouseinputs.pauseButtonCondition_resume(200, 100, 400, 100, frame);
+                inSettings = pauseButtonCondition_settings(200, 210, 400, 100);
                 mouseinputs.pauseButtonCondition_exit(200, 320, 400, 100);
-                mouseinputs.pauseButtonCondition_quit(200, 430, 400, 100);
+                mouseinputs.pauseButtonCondition_quit(200, 430, 400, 100, frame);
+            } else if (paused & inSettings) {
+
+                inSettings = pauseButtonCondition_settingsExit(200, 500, 400, 100);
             }
 
             if ((timeElapsed >= 1000 / FPS) & !loading) {
                 update();
             }
         }
+    }
+
+    public boolean pauseButton(boolean paused, JFrame frame) {
+        //var pauseIcon = new ImageIcon("res/wall.png");
+        //var pauseLabel = new JLabel(pauseIcon);
+        //System.out.println(KeyEvent.KEY_PRESSED);
+
+        if (paused & inputs.keys_push.contains(80)) {
+            //frame.add(pauseLabel);
+
+            //Remove cursor
+            BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+            Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+                    cursorImg, new Point(0, 0), "blank cursor");
+            frame.getContentPane().setCursor(blankCursor);
+
+            System.out.println("unpaused");
+            return false;
+        } else if (!paused & inputs.keys_push.contains(80)) {
+            //Draws temporary pause buttons
+            drawImage(getBufferStrategy(), loadingImage, 50, 50, 625, 625);
+            drawImage(getBufferStrategy(), loadingImage, 200, 100, 400, 100);
+            drawImage(getBufferStrategy(), loadingImage, 200, 210, 400, 100);
+            drawImage(getBufferStrategy(), loadingImage, 200, 320, 400, 100);
+            drawImage(getBufferStrategy(), loadingImage, 200, 430, 400, 100);
+
+            //Return cursor
+            frame.getContentPane().setCursor(Cursor.getDefaultCursor());
+
+            System.out.println("paused");
+            return true;
+        }
+        return paused;
+    }
+
+    //Executes condition for settings button
+    public boolean pauseButtonCondition_settings(int x, int y, int w, int h) {
+        if (mouseinputs.mouseClick != null) {
+            if (mouseinputs.mouseClick.getX() > x & mouseinputs.mouseClick.getY() > y &
+                    mouseinputs.mouseClick.getX() < (x + w) & mouseinputs.mouseClick.getY() < (y + h)) {
+                System.out.println("settings");
+
+                drawImage(getBufferStrategy(), loadingImage, 50, 50, 625, 625);
+                drawImage(getBufferStrategy(), loadingImage, 200, 500, 400, 100);
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean pauseButtonCondition_settingsExit(int x, int y, int w, int h) {
+        if (mouseinputs.mouseClick != null) {
+            if (mouseinputs.mouseClick.getX() > x & mouseinputs.mouseClick.getY() > y &
+                    mouseinputs.mouseClick.getX() < (x + w) & mouseinputs.mouseClick.getY() < (y + h)) {
+                System.out.println("settings exit");
+                drawImage(getBufferStrategy(), loadingImage, 50, 50, 625, 625);
+                drawImage(getBufferStrategy(), loadingImage, 200, 100, 400, 100);
+                drawImage(getBufferStrategy(), loadingImage, 200, 210, 400, 100);
+                drawImage(getBufferStrategy(), loadingImage, 200, 320, 400, 100);
+                drawImage(getBufferStrategy(), loadingImage, 200, 430, 400, 100);
+                return false;
+            }
+        }
+        return true;
     }
 }
