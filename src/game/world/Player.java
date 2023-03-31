@@ -17,17 +17,15 @@ public class Player {
         int lastSector = this.sector;
         while ((i = wallCollision(moveTo, exc)) != -1) {
             if (i == -2 && this.sector != lastSector) {
-                System.out.println("portal recurs");
                 exc = getPortalTo(lastSector);
                 lastSector = this.sector;
                 continue;
             }
 
-            System.out.println("i: " + i + ", sector: " + sector);
             Sector sector = world.sectors.get(this.sector);
             int[] sectVerts = sector.vertices;
 
-            System.out.println("start i = " + i);
+//            System.out.println("start i = " + i);
             int j = i == 0 ? sectVerts.length - 1 : i - 1;
             //System.out.println(moveTo.x + " " + moveTo.y);
             float buf = (float) 0.1;
