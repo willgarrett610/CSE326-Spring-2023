@@ -1,5 +1,7 @@
 package game;
 
+import game.renderer.Texture;
+
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.net.URL;
@@ -19,6 +21,11 @@ public class ResourceLoader {
         bImg.getGraphics().drawImage(img, 0, 0, null);
 
         return bImg;
+    }
+
+    public static Texture loadTexture(String name) {
+        BufferedImage img = loadImage(name);
+        return new Texture(img);
     }
 
 }

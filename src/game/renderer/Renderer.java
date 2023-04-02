@@ -75,7 +75,9 @@ public class Renderer {
         while ((head = renderQueue.poll()) != null) {
             Sector sector = world.sectors.get(head.sector);
 
-            renderQueue.addAll(renderSector(playerAngle, playerLocation, playerSector, world, sector, head, yTop, yBottom));
+            SectorItems items = renderSector(playerAngle, playerLocation, playerSector, world, sector, head, yTop, yBottom);
+
+            renderQueue.addAll(items.sectors);
 
             boolean complete = true;
             for (int i = 0; i < width; i++) {
@@ -97,7 +99,7 @@ public class Renderer {
         //g.drawImage(map, 0, 0, null);
     }
 
-    public List<QueueItem> renderSector(
+    public SectorItems renderSector(
             float playerAngle,
             Vec2f playerLocation,
             int playerSectorI,
@@ -338,7 +340,7 @@ public class Renderer {
             }
         }
 
-        return renderQueue;
+        return new SectorItems(renderQueue, null);
     }
 
     public BufferedImage renderMap(float angle) {
@@ -465,14 +467,14 @@ public class Renderer {
     }
 
     public void floorVLine(int x, int y1, int y2, Vec2f bl, Vec2f ur, float floorHeight, float angle, Vec2f pos) {
-        BufferedImage texture = player.world.textures.get(0);
+        Texture texture = player.world.textures.get(0);
 
         float scale = 20;
         for (int y = y1; y <= y2; y++) {
                 Vec2f worldPos = screenToFloor((float) x - (float) width / 2, (float) y - (float) height / 2, floorHeight, angle, pos);
                 int iX = (int) (Math.abs(Math.floor(texture.getWidth() * (worldPos.x - bl.x) / (ur.x - bl.x))) / scale % texture.getWidth());
                 int iY = (int) (Math.abs(Math.floor(texture.getHeight() * (worldPos.y - bl.y) / (ur.y - bl.y))) / scale % texture.getHeight());
-                screen[x + y * width] = texture.getRGB(iX, iY);
+                screen[x + y * width] = texture.getPixel(iX, iY);
                 //if (Math.abs(worldPos.x/scale) < 1 && Math.abs(worldPos.y/scale) < 1) {
                 //    g.setColor(Color.getHSBColor(Math.abs(worldPos.x)/scale, 1, Math.abs(worldPos.y)/scale));
                 //} else {
@@ -505,12 +507,14 @@ public class Renderer {
         return 0;
     }
 
-    public void imgVline(int x, int y1, int y2, double tx, double ty, double th, BufferedImage image) {
+    public void imgVline(int x, int y1, int y2, double tx, double ty, double th, Texture image) {
         if (th == 0)
             return;
 
         // Get the image x position
         int iX = (int)Math.floor(tx * image.getWidth()) % image.getWidth();
+
+        int[] imgColumn = image.getColumn(iX);
 
         for (int y = y1; y <= y2; y++) {
             // Get the image y position
@@ -520,9 +524,9 @@ public class Renderer {
             int iY = (int)Math.floor(tYNew * image.getHeight()) % image.getHeight();
 
             // Sample pixel from image and draw to screen
-            Color c = new Color(image.getRGB(iX, iY), true);
+            Color c = new Color(imgColumn[iY], true);
             if(c.getAlpha() == 255)
-                screen[x + y * width] = image.getRGB(iX, iY);
+                screen[x + y * width] = imgColumn[iY];
             else if (c.getAlpha() > 0) {
                 double alpha = c.getAlpha() / 255.0;
                 // calculate new color using rgba channels individually

@@ -1,6 +1,7 @@
 package game.world;
 
 import game.ResourceLoader;
+import game.renderer.Texture;
 
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
@@ -14,7 +15,7 @@ public class MapLoader {
     public static World load(String mapName) {
         List<Vec2f> vertices = new ArrayList<>();
         List<Sector> sectors = new ArrayList<>();
-        List<BufferedImage> textures = new ArrayList<>();
+        List<Texture> textures = new ArrayList<>();
         Vec2f playerLocation = null;
         float playerAngle = 0;
         int playerSector = 0;
@@ -38,7 +39,7 @@ public class MapLoader {
                 String[] args = line.split("[ ]+");
                 String fileName = args[0];
 
-                BufferedImage img = ResourceLoader.loadImage(fileName);
+                Texture img = ResourceLoader.loadTexture(fileName);
                 textures.add(img);
             } else if (line.startsWith("sector")) {
                 line = line.replaceAll("sector[ ]+", "");

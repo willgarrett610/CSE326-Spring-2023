@@ -1,5 +1,6 @@
 package game.world;
 
+import game.renderer.Texture;
 import game.world.entity.Entity;
 
 import java.awt.image.BufferedImage;
@@ -9,14 +10,14 @@ import java.util.List;
 public class World {
     public List<Vec2f> vertices;
     public List<Sector> sectors;
-    public List<BufferedImage> textures;
+    public List<Texture> textures;
     public List<Entity> entities;
 
     Vec2f startLocation;
     float startAngle;
     int startSector;
 
-    public World(List<Vec2f> vertices, List<Sector> sectors, List<BufferedImage> textures, Vec2f startLocation, float startAngle, int startSector) {
+    public World(List<Vec2f> vertices, List<Sector> sectors, List<Texture> textures, Vec2f startLocation, float startAngle, int startSector) {
         this.vertices = vertices;
         this.sectors = sectors;
         this.textures = textures;
