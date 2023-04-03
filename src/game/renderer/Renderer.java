@@ -122,6 +122,7 @@ public class Renderer {
         // Render entities
         // TODO: Figure out how to draw entities only in visible areas without interfering with wall rendering
 
+
         // Loop through each wall of the current sector
         for (int i = 0; i < sector.vertices.length; i++) {
             // p1Trans is the vertex to the left of the current vertex index.
@@ -464,6 +465,10 @@ public class Renderer {
         float xOut = x * yOut / this.hFov;
 
         return worldPoint(new Vec2f(xOut,yOut), angle, pos);
+    }
+
+    public static Sprite clipTextureRender(int x, int y, float height, int[] yTop, int[] yBot, Texture texture) {
+
     }
 
     public void floorVLine(int x, int y1, int y2, Vec2f bl, Vec2f ur, float floorHeight, float angle, Vec2f pos) {

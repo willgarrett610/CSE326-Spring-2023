@@ -1,5 +1,6 @@
 package game.world.entity;
 
+import game.renderer.Texture;
 import game.world.Vec2f;
 import game.world.World;
 
@@ -19,7 +20,7 @@ public abstract class Entity {
         this.sector = sector;
     }
 
-    public abstract BufferedImage getImage();
+    public abstract Texture getTexture();
 
     public World getWorld() {
         return this.world;
