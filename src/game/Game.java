@@ -33,6 +33,13 @@ public class Game extends Canvas implements Runnable {
     private int screen[];
 
     BufferedImage loadingImage;
+    BufferedImage PauseButton_Resume;
+    BufferedImage PauseButton_Settings;
+    BufferedImage PauseButton_Menu;
+    BufferedImage PauseButton_Quit;
+    BufferedImage PauseButton_Exit;
+    BufferedImage Pause_Background;
+
 
     public JFrame frame;
 
@@ -66,6 +73,12 @@ public class Game extends Canvas implements Runnable {
         frame.setVisible(true);
 
         loadingImage = ResourceLoader.loadImage("loading.png");
+        PauseButton_Resume = ResourceLoader.loadImage("ResumeButton.png");
+        PauseButton_Settings = ResourceLoader.loadImage("SettingsButton.png");
+        PauseButton_Menu = ResourceLoader.loadImage("MenuButton.png");
+        PauseButton_Quit = ResourceLoader.loadImage("QuitButton.png");
+        PauseButton_Exit = ResourceLoader.loadImage("ExitButton.png");
+        Pause_Background = ResourceLoader.loadImage("PauseBackground.png");
 
         // Remove cursor on window
         BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -223,12 +236,13 @@ public class Game extends Canvas implements Runnable {
             System.out.println("unpaused");
             return false;
         } else if (!paused & inputs.keys_push.contains(80)) {
-            //Draws temporary pause buttons
-            drawImage(getBufferStrategy(), loadingImage, 50, 50, 625, 625);
-            drawImage(getBufferStrategy(), loadingImage, 200, 100, 400, 100);
-            drawImage(getBufferStrategy(), loadingImage, 200, 210, 400, 100);
-            drawImage(getBufferStrategy(), loadingImage, 200, 320, 400, 100);
-            drawImage(getBufferStrategy(), loadingImage, 200, 430, 400, 100);
+            //Draws pause buttons
+            drawImage(getBufferStrategy(), Pause_Background, 50, 50, 700, 700);
+            drawImage(getBufferStrategy(), PauseButton_Resume, 200, 100, 400, 100);
+            drawImage(getBufferStrategy(), PauseButton_Settings, 200, 210, 400, 100);
+            drawImage(getBufferStrategy(), PauseButton_Menu, 200, 320, 400, 100);
+            drawImage(getBufferStrategy(), PauseButton_Quit, 200, 430, 400, 100);
+            drawImage(getBufferStrategy(), PauseButton_Quit, 200, 430, 400, 100);
 
             //Return cursor
             frame.getContentPane().setCursor(Cursor.getDefaultCursor());
@@ -246,8 +260,9 @@ public class Game extends Canvas implements Runnable {
                     mouseinputs.mouseClick.getX() < (x + w) & mouseinputs.mouseClick.getY() < (y + h)) {
                 System.out.println("settings");
 
-                drawImage(getBufferStrategy(), loadingImage, 50, 50, 625, 625);
-                drawImage(getBufferStrategy(), loadingImage, 200, 500, 400, 100);
+                drawImage(getBufferStrategy(), Pause_Background, 50, 50, 700, 700);
+                drawImage(getBufferStrategy(), PauseButton_Exit, 200, 500, 400, 100);
+                drawImage(getBufferStrategy(), PauseButton_Exit, 200, 500, 400, 100);
 
                 return true;
             }
@@ -260,11 +275,15 @@ public class Game extends Canvas implements Runnable {
             if (mouseinputs.mouseClick.getX() > x & mouseinputs.mouseClick.getY() > y &
                     mouseinputs.mouseClick.getX() < (x + w) & mouseinputs.mouseClick.getY() < (y + h)) {
                 System.out.println("settings exit");
-                drawImage(getBufferStrategy(), loadingImage, 50, 50, 625, 625);
-                drawImage(getBufferStrategy(), loadingImage, 200, 100, 400, 100);
-                drawImage(getBufferStrategy(), loadingImage, 200, 210, 400, 100);
-                drawImage(getBufferStrategy(), loadingImage, 200, 320, 400, 100);
-                drawImage(getBufferStrategy(), loadingImage, 200, 430, 400, 100);
+
+                //Draws pause buttons
+                drawImage(getBufferStrategy(), Pause_Background, 50, 50, 700, 700);
+                drawImage(getBufferStrategy(), PauseButton_Resume, 200, 100, 400, 100);
+                drawImage(getBufferStrategy(), PauseButton_Settings, 200, 210, 400, 100);
+                drawImage(getBufferStrategy(), PauseButton_Menu, 200, 320, 400, 100);
+                drawImage(getBufferStrategy(), PauseButton_Quit, 200, 430, 400, 100);
+                drawImage(getBufferStrategy(), PauseButton_Quit, 200, 430, 400, 100);
+
                 return false;
             }
         }
