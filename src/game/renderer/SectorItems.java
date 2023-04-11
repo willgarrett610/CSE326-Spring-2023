@@ -8,11 +8,11 @@ import java.util.List;
 public class SectorItems {
 
     protected List<QueueItem> sectors;
-    protected List<Entity> entities;
+    protected List<Sprite> sprites;
 
-    protected SectorItems(List<QueueItem> sectors, List<Entity> entities) {
+    protected SectorItems(List<QueueItem> sectors, List<Sprite> sprites) {
         this.sectors = sectors;
-        this.entities = entities;
+        this.sprites = sprites;
     }
 
 }
