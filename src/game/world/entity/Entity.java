@@ -1,5 +1,6 @@
 package game.world.entity;
 
+import game.renderer.Texture;
 import game.world.Vec2f;
 import game.world.World;
 
@@ -10,16 +11,18 @@ public abstract class Entity {
     private World world;
     private Vec2f location;
     private float height;
+    private Vec2f size;
     private int sector;
 
-    public Entity(World world, Vec2f location, float height, int sector) {
+    public Entity(World world, Vec2f location, float height, Vec2f size, int sector) {
         this.world = world;
         this.location = location;
         this.height = height;
+        this.size = size;
         this.sector = sector;
     }
 
-    public abstract BufferedImage getImage();
+    public abstract Texture getTexture();
 
     public World getWorld() {
         return this.world;
@@ -31,6 +34,10 @@ public abstract class Entity {
 
     public float getHeight() {
         return this.height;
+    }
+
+    public Vec2f getSize() {
+        return this.size;
     }
 
     public int getSector() {
