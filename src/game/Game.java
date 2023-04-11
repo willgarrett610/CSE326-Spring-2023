@@ -21,6 +21,8 @@ public class Game extends Canvas implements Runnable {
     static final int width = 800;
     static final int height = 800;
 
+    public float volume = 50;
+
     public Player player;
 
     private InputListener inputs;
@@ -32,6 +34,8 @@ public class Game extends Canvas implements Runnable {
     private BufferedImage buf;
     private int screen[];
 
+    Point mousePos;
+
     BufferedImage loadingImage;
     BufferedImage PauseButton_Resume;
     BufferedImage PauseButton_Settings;
@@ -39,6 +43,8 @@ public class Game extends Canvas implements Runnable {
     BufferedImage PauseButton_Quit;
     BufferedImage PauseButton_Exit;
     BufferedImage Pause_Background;
+    BufferedImage Slider_Background;
+    BufferedImage Slider_Foreground;
 
 
     public JFrame frame;
@@ -79,6 +85,8 @@ public class Game extends Canvas implements Runnable {
         PauseButton_Quit = ResourceLoader.loadImage("QuitButton.png");
         PauseButton_Exit = ResourceLoader.loadImage("ExitButton.png");
         Pause_Background = ResourceLoader.loadImage("PauseBackground.png");
+        Slider_Background = ResourceLoader.loadImage("SliderBackground.png");
+        Slider_Foreground = ResourceLoader.loadImage("SliderForeground.png");
 
         // Remove cursor on window
         BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -197,6 +205,8 @@ public class Game extends Canvas implements Runnable {
 
         while (running) {
             // Remain withing frame-rate cap
+            mousePos = MouseInfo.getPointerInfo().getLocation();
+            mousePos = new Point(mousePos.x - frame.getLocation().x, mousePos.y - frame.getLocation().y);
 
             long timeElapsed = System.currentTimeMillis() - lastUpdate;
             if ((timeElapsed >= 1000 / FPS) & !paused) {
@@ -209,8 +219,8 @@ public class Game extends Canvas implements Runnable {
                 mouseinputs.pauseButtonCondition_exit(200, 320, 400, 100);
                 mouseinputs.pauseButtonCondition_quit(200, 430, 400, 100, frame);
             } else if (paused & inSettings) {
-
                 inSettings = pauseButtonCondition_settingsExit(200, 500, 400, 100);
+                volume = pauseButtonCondition_settingsVolume(200, 320, 400, 30, volume);
             }
 
             if ((timeElapsed >= 1000 / FPS) & !loading) {
@@ -260,9 +270,17 @@ public class Game extends Canvas implements Runnable {
                     mouseinputs.mouseClick.getX() < (x + w) & mouseinputs.mouseClick.getY() < (y + h)) {
                 System.out.println("settings");
 
+                //Draw settings menu
                 drawImage(getBufferStrategy(), Pause_Background, 50, 50, 700, 700);
                 drawImage(getBufferStrategy(), PauseButton_Exit, 200, 500, 400, 100);
-                drawImage(getBufferStrategy(), PauseButton_Exit, 200, 500, 400, 100);
+                //drawImage(getBufferStrategy(), PauseButton_Exit, 200, 500, 400, 100);
+
+                int sliderWidth = 400/100 * ((int) volume);
+
+                //Draw sliders
+                drawImage(getBufferStrategy(), Slider_Background, 200, 300, 400, 10);
+                drawImage(getBufferStrategy(), Slider_Foreground, 200, 300, sliderWidth, 10);
+                drawImage(getBufferStrategy(), Slider_Foreground, 200, 300, sliderWidth, 10);
 
                 return true;
             }
@@ -288,5 +306,24 @@ public class Game extends Canvas implements Runnable {
             }
         }
         return true;
+    }
+
+    public float pauseButtonCondition_settingsVolume(int x, int y, int w, int h, float v) {
+        float volume = v;
+
+        if (mouseinputs.mouseHeld) {
+            if (mousePos.getX() > x & mousePos.getY() > y &
+                    mousePos.getX() < (x + w) & mousePos.getY() < (y + h)) {
+                volume = (((float) mousePos.getX() - x) / w) * 100;
+                //System.out.println("Volume" + volume);
+                int sliderWidth = 400/100 * ((int) volume);
+
+                //Draw sliders
+                drawImage(getBufferStrategy(), Slider_Background, 200, 300, 400, 10);
+                drawImage(getBufferStrategy(), Slider_Foreground, 200, 300, sliderWidth, 10);
+                drawImage(getBufferStrategy(), Slider_Foreground, 200, 300, sliderWidth, 10);
+            }
+        }
+        return volume;
     }
 }

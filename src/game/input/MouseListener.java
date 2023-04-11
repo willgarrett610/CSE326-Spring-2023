@@ -11,8 +11,10 @@ import java.awt.image.BufferedImage;
 
 public class MouseListener extends MouseAdapter {
     public Point mouseClick;
+    //public Point mousePos = MouseInfo.getPointerInfo().getLocation();
 
     public boolean mouseclicked = false;
+    public boolean mouseHeld = false;
 
     //Gets coordinates for when mouse is clicked
     @Override
@@ -20,6 +22,18 @@ public class MouseListener extends MouseAdapter {
         System.out.println(e.getX() + ", " + e.getY());
         mouseClick = e.getPoint();
         mouseclicked = true;
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        mouseHeld = true;
+        System.out.println("Mouse Held");
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        mouseHeld = false;
+        System.out.println("Mouse Released");
     }
 
     //Executes condition for resume button
