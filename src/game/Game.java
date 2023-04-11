@@ -6,6 +6,7 @@ import game.renderer.Renderer;
 import game.renderer.Texture;
 import game.world.MapLoader;
 import game.world.Player;
+import game.world.Vec2f;
 import game.world.World;
 import game.world.entity.Enemy;
 
@@ -101,7 +102,7 @@ public class Game extends Canvas implements Runnable {
 
         Texture alien = ResourceLoader.loadTexture("alien.jpg");
 
-        Enemy enemy = new Enemy(world, player.location, 1, player.sector, alien);
+        Enemy enemy = new Enemy(world, player.location, 1, new Vec2f(10,10), player.sector, alien);
 
         world.addEntity(enemy);
 

@@ -7,15 +7,14 @@ import game.world.Vec2f;
 import game.world.World;
 import game.world.entity.Entity;
 
+import javax.xml.stream.Location;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.awt.image.Raster;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Queue;
 
 public class Renderer {
 
@@ -71,6 +70,8 @@ public class Renderer {
         Queue<QueueItem> renderQueue = new LinkedList<>();
         renderQueue.add(new QueueItem(playerSector, -2, 0, width-1));
 
+        Stack<Sprite> spriteStack = new Stack<>();
+
         QueueItem head;
         while ((head = renderQueue.poll()) != null) {
             Sector sector = world.sectors.get(head.sector);
@@ -78,6 +79,9 @@ public class Renderer {
             SectorItems items = renderSector(playerAngle, playerLocation, playerSector, world, sector, head, yTop, yBottom);
 
             renderQueue.addAll(items.sectors);
+            items.sprites.forEach(s -> {
+                if (s != null) spriteStack.push(s);
+            });
 
             boolean complete = true;
             for (int i = 0; i < width; i++) {
@@ -88,6 +92,10 @@ public class Renderer {
             }
             if (complete)
                 break;
+        }
+
+        while (!spriteStack.empty()) {
+            spriteStack.pop().renderTo(this.screen, this.width, this.height);
         }
 
         BufferedImage map = renderMap(playerAngle);
@@ -109,6 +117,9 @@ public class Renderer {
             int[] yTop,
             int[] yBottom
     ) {
+        int heightHalf = this.height / 2;
+        int widthHalf = this.width / 2;
+
         // The sector the player is standing in currently
         Sector playerSector = world.sectors.get(playerSectorI);
 
@@ -118,10 +129,39 @@ public class Renderer {
         List<Entity> entities = world.entities.stream()
                 .filter(e -> (e.getSector() == world.sectors.indexOf(sector)))
                 .toList();
+        // TODO: Optimize so we don't recalculate same distance
+        entities = entities.stream()
+                .sorted((a, b) -> (int) Math.ceil(a.getLocation().distanceTo(playerLocation) - b.getLocation().distanceTo(playerLocation)))
+                .toList();
+
+        List<Sprite> sprites = new ArrayList<>();
 
         // Render entities
-        // TODO: Figure out how to draw entities only in visible areas without interfering with wall rendering
+        for (Entity entity : entities) {
+            // Translate entity location
+            Vec2f transLoc = relativePoint(entity.getLocation(), playerAngle, playerLocation);
 
+            if (transLoc.y < 0.01) continue;
+
+            Vec2f scale = new Vec2f(hFov / transLoc.y, vFov / transLoc.y);
+            int leftX = (int) Math.floor((transLoc.x - entity.getSize().x/2) * scale.x);
+            leftX += widthHalf;
+            int rightX = (int) Math.floor((transLoc.x + entity.getSize().x/2) * scale.x);
+            rightX += widthHalf;
+
+            float heightOff = (sector.floorHeight - playerSector.floorHeight);
+
+            float relEntityBot = heightOff - eyeHeight + entity.getHeight();
+            float relEntityTop = relEntityBot + entity.getSize().y;
+
+            int botY = (int) (-relEntityBot * scale.y) + heightHalf;
+            int topY = (int) (-relEntityTop * scale.y) + heightHalf;
+
+            if (rightX == leftX) continue;
+
+            Sprite sprite = clipTextureRender(leftX, topY, rightX - leftX, botY - topY, yTop, yBottom, entity.getTexture());
+            sprites.add(sprite);
+        }
 
         // Loop through each wall of the current sector
         for (int i = 0; i < sector.vertices.length; i++) {
@@ -165,8 +205,6 @@ public class Renderer {
             // Find x projections
             float x1Proj = p1TransCut.x * scale1.x;
             float x2Proj = p2TransCut.x * scale2.x;
-            int heightHalf = this.height / 2;
-            int widthHalf = this.width / 2;
             x1Proj += widthHalf;
             x2Proj += widthHalf;
 
@@ -341,7 +379,7 @@ public class Renderer {
             }
         }
 
-        return new SectorItems(renderQueue, null);
+        return new SectorItems(renderQueue, sprites);
     }
 
     public BufferedImage renderMap(float angle) {
@@ -467,8 +505,44 @@ public class Renderer {
         return worldPoint(new Vec2f(xOut,yOut), angle, pos);
     }
 
-    public static Sprite clipTextureRender(int x, int y, float height, int[] yTop, int[] yBot, Texture texture) {
+    public Sprite clipTextureRender(int x, int y, int width, int height, int[] yTop, int[] yBot, Texture texture) {
+        float scaleX = (float) texture.getWidth() / (float) width;
+        float scaleY = (float) texture.getHeight() / (float) height;
 
+        if (x > this.width) return null;
+
+        int leftXClamp = Math.max(x, 0);
+        int widthClamp = clamp(width, 0, this.width - x);
+
+        if (widthClamp == 0) return null;
+
+        int xOff = leftXClamp - x;
+
+        if (xOff > widthClamp) return null;
+
+        int[][] spriteColumns = new int[widthClamp][];
+
+        for (int iX = xOff; iX < widthClamp; iX++) {
+
+            int sampleX = (int) Math.floor(iX * scaleX);
+
+            int[] column = new int[height];
+
+            for (int iY = 0; iY < height; iY++) {
+                // Clip regions behind walls
+                if (iY + y < yTop[iX + x] || iY + y > yBot[iX + x] || iX + x < 0 || iX + x >= this.width) {
+                    column[iY] = 0;
+                    continue;
+                }
+
+                int sampleY = (int) Math.floor(iY * scaleY);
+
+                column[iY] = texture.getPixel(sampleX, sampleY);
+            }
+
+            spriteColumns[iX - xOff] = column;
+        }
+        return new Sprite(leftXClamp, y, widthClamp - (leftXClamp - x), height, spriteColumns);
     }
 
     public void floorVLine(int x, int y1, int y2, Vec2f bl, Vec2f ur, float floorHeight, float angle, Vec2f pos) {
