@@ -123,7 +123,7 @@ public class Game extends Canvas implements Runnable {
 
         Texture alien = ResourceLoader.loadTexture("alien.png");
 
-        Enemy enemy = new Enemy(world, player.location, 1, new Vec2f(10,10), player.sector, alien);
+        Enemy enemy = new Enemy(world, player.location, 0, new Vec2f((float) 5.2, (float) 9.8), player.sector, alien);
 
         world.addEntity(enemy);
 
