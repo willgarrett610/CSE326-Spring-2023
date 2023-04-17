@@ -2,6 +2,7 @@ package game;
 
 import game.input.InputListener;
 import game.input.MouseListener;
+import game.menu.MainMenu;
 import game.renderer.Renderer;
 import game.renderer.Texture;
 import game.world.MapLoader;
@@ -31,6 +32,8 @@ public class Game extends Canvas implements Runnable {
 
     private MouseListener mouseinputs;
 
+    private final MainMenu menu;
+
     public Renderer renderer;
 
     private BufferedImage buf;
@@ -47,6 +50,8 @@ public class Game extends Canvas implements Runnable {
     BufferedImage Pause_Background;
     BufferedImage Slider_Background;
     BufferedImage Slider_Foreground;
+
+    BufferedImage mainMenu;
 
 
     public JFrame frame;
@@ -89,12 +94,14 @@ public class Game extends Canvas implements Runnable {
         Pause_Background = ResourceLoader.loadImage("PauseBackground.png");
         Slider_Background = ResourceLoader.loadImage("SliderBackground.png");
         Slider_Foreground = ResourceLoader.loadImage("SliderForeground.png");
+        mainMenu = ResourceLoader.loadImage("mainmenu.png");
+
 
         // Remove cursor on window
-        BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-        Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-                cursorImg, new Point(0, 0), "blank cursor");
-        frame.getContentPane().setCursor(blankCursor);
+//        BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+//        Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+//                cursorImg, new Point(0, 0), "blank cursor");
+//        frame.getContentPane().setCursor(blankCursor);
 
         try {
             inputs = new InputListener(this);
@@ -112,6 +119,10 @@ public class Game extends Canvas implements Runnable {
         renderer = new Renderer(width, height);
         buf = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         screen = ((DataBufferInt) (buf.getRaster().getDataBuffer())).getData();
+        menu = new MainMenu(this);
+
+        this.addMouseListener(menu);
+        this.addMouseMotionListener(menu);
     }
 
     public void loadWorld() {
@@ -163,6 +174,7 @@ public class Game extends Canvas implements Runnable {
                 Graphics g = bufStrat.getDrawGraphics();
                 try {
                     g.drawImage(buf, 0, 0, null);
+                    drawMenu(mainMenu, g);
 
                     int realFPS = Math.round(1000f / (float) timeElapsed);
                     g.setColor(Color.BLACK);
@@ -327,5 +339,25 @@ public class Game extends Canvas implements Runnable {
             }
         }
         return volume;
+    }
+
+    /**
+     * Draws the main menu
+     *
+     * @param mainMenu preloaded main menu image
+     * @param g graphics drawer
+     * @author Isaiah Sandoval
+     */
+    public void drawMenu(BufferedImage mainMenu, Graphics g) {
+        if (menu.active) {
+            frame.getContentPane().setCursor(Cursor.getDefaultCursor());
+            menu.draw(g, getHeight(), getWidth(), mainMenu);
+        } else {
+            BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+            Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+                cursorImg, new Point(0, 0), "blank cursor");
+            frame.getContentPane().setCursor(blankCursor);
+        }
+
     }
 }
