@@ -7,15 +7,18 @@ import game.renderer.Renderer;
 import game.renderer.Texture;
 import game.world.MapLoader;
 import game.world.Player;
-import game.world.Vec2f;
 import game.world.World;
-import game.world.entity.Enemy;
+import game.world.entity.Alien;
+import game.world.entity.Entity;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Game extends Canvas implements Runnable {
 
@@ -52,6 +55,8 @@ public class Game extends Canvas implements Runnable {
     BufferedImage Slider_Foreground;
 
     BufferedImage mainMenu;
+
+    List<Texture> alienAnim;
 
 
     public JFrame frame;
@@ -96,6 +101,22 @@ public class Game extends Canvas implements Runnable {
         Slider_Foreground = ResourceLoader.loadImage("SliderForeground.png");
         mainMenu = ResourceLoader.loadImage("mainmenu.png");
 
+        Texture alien15 = ResourceLoader.loadTexture("alien.png");
+        Texture alien24 = ResourceLoader.loadTexture("alien_walk_2_4.png");
+        Texture alien3 = ResourceLoader.loadTexture("alien_walk_3.png");
+        Texture alien68 = ResourceLoader.loadTexture("alien_walk_6_8.png");
+        Texture alien7 = ResourceLoader.loadTexture("alien_walk_7.png");
+
+        alienAnim = new ArrayList<>();
+
+        alienAnim.add(alien15);
+        alienAnim.add(alien24);
+        alienAnim.add(alien3);
+        alienAnim.add(alien24);
+        alienAnim.add(alien15);
+        alienAnim.add(alien68);
+        alienAnim.add(alien7);
+        alienAnim.add(alien68);
 
         // Remove cursor on window
 //        BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -132,9 +153,7 @@ public class Game extends Canvas implements Runnable {
 
         player = new Player(world);
 
-        Texture alien = ResourceLoader.loadTexture("alien.png");
-
-        Enemy enemy = new Enemy(world, player.location, 0, new Vec2f((float) 5.2, (float) 9.8), player.sector, alien);
+        Alien enemy = new Alien(world, player.location, player.sector, player, alienAnim);
 
         world.addEntity(enemy);
 
@@ -198,6 +217,11 @@ public class Game extends Canvas implements Runnable {
         if (mouseinputs.mouseClick != null) {
             mouseinputs.mouseClick.x = 0;
             mouseinputs.mouseClick.y = 0;
+        }
+
+        // Update entities
+        for (Entity e : player.world.entities) {
+            e.tick();
         }
     }
 

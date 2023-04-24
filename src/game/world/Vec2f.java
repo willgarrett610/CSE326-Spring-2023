@@ -2,6 +2,8 @@ package game.world;
 
 public class Vec2f {
 
+    public static final Vec2f ZERO = new Vec2f(0,0);
+
     public float x;
     public float y;
 
@@ -48,6 +50,20 @@ public class Vec2f {
 
     public Vec2f clone() {
         return new Vec2f(this.x, this.y);
+    }
+
+    public Vec2f normalize() {
+        float length = distanceTo(ZERO);
+        return new Vec2f(x/length, y/length);
+    }
+
+    public Vec2f pointToNormalized(Vec2f b) {
+        Vec2f pointing = new Vec2f(x - b.x, y - b.y);
+
+        // Point b is the same as this point
+        if (pointing.x == 0 && pointing.y == 0) return ZERO;
+
+        return pointing.normalize().multiply(-1,1);
     }
 
     @Override

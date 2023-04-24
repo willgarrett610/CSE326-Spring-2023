@@ -68,10 +68,10 @@ public class InputListener implements KeyListener, MouseMotionListener {
         }
 
         if (keys.contains(KeyEvent.VK_LEFT)) {
-            game.player.angle -= Settings.mouseSpeed;
+            game.player.angle -= Settings.mouseSpeed * 15;
         }
         if (keys.contains(KeyEvent.VK_RIGHT)) {
-            game.player.angle += Settings.mouseSpeed;
+            game.player.angle += Settings.mouseSpeed * 15;
         }
 
         game.player.move(moveTo);
