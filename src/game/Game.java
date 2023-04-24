@@ -58,6 +58,13 @@ public class Game extends Canvas implements Runnable {
 
     List<Texture> alienAnim;
 
+    List<BufferedImage> gunAnim;
+
+    BufferedImage gun1;
+    BufferedImage gun2;
+    BufferedImage gun3;
+    boolean shoot_cond = false;
+    int shootFrame = 0;
 
     public JFrame frame;
 
@@ -69,6 +76,7 @@ public class Game extends Canvas implements Runnable {
     public boolean paused = false;
 
     public boolean inSettings = false;
+    public boolean inMainMenu = true;
 
     public static void main(String[] args) {
         Game game = new Game();
@@ -107,6 +115,10 @@ public class Game extends Canvas implements Runnable {
         Texture alien68 = ResourceLoader.loadTexture("alien_walk_6_8.png");
         Texture alien7 = ResourceLoader.loadTexture("alien_walk_7.png");
 
+        gun1 = ResourceLoader.loadImage("gunFrame1.png");
+        gun2 = ResourceLoader.loadImage("gunFrame2.png");
+        gun3 = ResourceLoader.loadImage("gunFrame3.png");
+
         alienAnim = new ArrayList<>();
 
         alienAnim.add(alien15);
@@ -117,6 +129,13 @@ public class Game extends Canvas implements Runnable {
         alienAnim.add(alien68);
         alienAnim.add(alien7);
         alienAnim.add(alien68);
+
+        gunAnim = new ArrayList<>();
+
+        gunAnim.add(gun1);
+        gunAnim.add(gun3);
+        gunAnim.add(gun2);
+        gunAnim.add(gun1);
 
         // Remove cursor on window
 //        BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -251,6 +270,9 @@ public class Game extends Canvas implements Runnable {
                 lastUpdate = System.currentTimeMillis();
                 render(timeElapsed);
 
+                if (!menu.active) {
+                    shoot_func();
+                }
             } else if (paused & !inSettings) {
                 paused = mouseinputs.pauseButtonCondition_resume(200, 100, 400, 100, frame);
                 inSettings = pauseButtonCondition_settings(200, 210, 400, 100);
@@ -363,6 +385,22 @@ public class Game extends Canvas implements Runnable {
             }
         }
         return volume;
+    }
+
+    public void shoot_func() {
+        if (mouseinputs.mouseclicked == true) {
+            System.out.println("shooting");
+            shoot_cond = true;
+        }
+        if(this.player != null) {
+            shootFrame = player.shoot_anim(gunAnim, shoot_cond);
+            drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 500, 350, 450, 450);
+            drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 500, 350, 450, 450);
+            if (shootFrame == 3) {
+                System.out.println("shot");
+                shoot_cond = false;
+            }
+        }
     }
 
     /**

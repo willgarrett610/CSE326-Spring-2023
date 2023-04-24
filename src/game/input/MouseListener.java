@@ -19,7 +19,7 @@ public class MouseListener extends MouseAdapter {
     //Gets coordinates for when mouse is clicked
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println(e.getX() + ", " + e.getY());
+        //System.out.println(e.getX() + ", " + e.getY());
         mouseClick = e.getPoint();
         mouseclicked = true;
     }
@@ -27,13 +27,13 @@ public class MouseListener extends MouseAdapter {
     @Override
     public void mousePressed(MouseEvent e) {
         mouseHeld = true;
-        System.out.println("Mouse Held");
+        //System.out.println("Mouse Held");
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         mouseHeld = false;
-        System.out.println("Mouse Released");
+        //System.out.println("Mouse Released");
     }
 
     //Executes condition for resume button
