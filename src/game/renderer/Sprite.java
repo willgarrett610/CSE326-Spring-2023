@@ -16,7 +16,7 @@ public class Sprite {
         this.columns = columns;
     }
 
-    public void renderTo(int[] pixels, int width, int height) {
+    public void renderTo(int[] pixels, int width) {
         for (int iX = 0; iX < this.width; iX++) {
             for (int iY = 0; iY < this.height; iY++) {
                 int sX = iX + this.x;

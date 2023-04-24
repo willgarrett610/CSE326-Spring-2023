@@ -10,8 +10,8 @@ public class Enemy extends Entity {
 
     Texture image;
 
-    public Enemy(World world, Vec2f location, float height, Vec2f size, int sector, Texture image) {
-        super(world, location, height, size, sector);
+    public Enemy(World world, Vec2f location, Vec2f velocity, float height, Vec2f size, int sector, Texture image) {
+        super(world, location, velocity, height, size, sector);
         this.image = image;
     }
 

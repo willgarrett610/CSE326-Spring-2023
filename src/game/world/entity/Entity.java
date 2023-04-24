@@ -10,13 +10,15 @@ public abstract class Entity {
 
     private World world;
     private Vec2f location;
+    private Vec2f velocity;
     private float height;
     private Vec2f size;
     private int sector;
 
-    public Entity(World world, Vec2f location, float height, Vec2f size, int sector) {
+    public Entity(World world, Vec2f location, Vec2f velocity, float height, Vec2f size, int sector) {
         this.world = world;
         this.location = location;
+        this.velocity = velocity;
         this.height = height;
         this.size = size;
         this.sector = sector;
@@ -32,6 +34,10 @@ public abstract class Entity {
         return this.location;
     }
 
+    public Vec2f getVelocity() {
+        return this.velocity;
+    }
+
     public float getHeight() {
         return this.height;
     }
@@ -44,8 +50,12 @@ public abstract class Entity {
         return this.sector;
     }
 
-    public void setLocation() {
+    public void setLocation(Vec2f location) {
         this.location = location;
+    }
+
+    public void setVelocity(Vec2f velocity) {
+        this.velocity = velocity;
     }
 
     public void setWorld(World world) {
@@ -54,6 +64,10 @@ public abstract class Entity {
 
     public void setHeight(float height) {
         this.height = height;
+    }
+
+    public void setSize(Vec2f size) {
+        this.size = size;
     }
 
     public void setSector(int sector) {

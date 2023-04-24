@@ -2,6 +2,8 @@ package game.world;
 
 public class Vec2f {
 
+    public static final Vec2f ZERO = new Vec2f(0,0);
+
     public float x;
     public float y;
 

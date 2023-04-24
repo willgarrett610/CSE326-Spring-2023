@@ -95,7 +95,7 @@ public class Renderer {
         }
 
         while (!spriteStack.empty()) {
-            spriteStack.pop().renderTo(this.screen, this.width, this.height);
+            spriteStack.pop().renderTo(this.screen, this.width);
         }
 
         BufferedImage map = renderMap(playerAngle);
@@ -509,26 +509,35 @@ public class Renderer {
         float scaleX = (float) texture.getWidth() / (float) width;
         float scaleY = (float) texture.getHeight() / (float) height;
 
-        if (x > this.width) return null;
+        // Sprite is outside of view window
+        if (x > this.width || y > this.height) return null;
 
+        // Clip sprite to within view window
         int leftXClamp = Math.max(x, 0);
-        int widthClamp = clamp(width, 0, this.width - x);
+        int widthClamp = clamp(width, 0, Math.min(this.width - x, this.width));
 
-        if (widthClamp == 0) return null;
+        int yClamp = Math.max(y, 0);
+        int heightClamp = clamp(height, 0, Math.min(this.height - y, this.height));
+
+        // Sprite is outside of view window
+        if (widthClamp == 0 || heightClamp == 0) return null;
 
         int xOff = leftXClamp - x;
+        int yOff = yClamp - y;
 
-        if (xOff > widthClamp) return null;
+        // Sprite is outside of view window
+        if (xOff > widthClamp || yOff > heightClamp) return null;
 
+        // Pixel data
         int[][] spriteColumns = new int[widthClamp][];
 
-        for (int iX = xOff; iX < widthClamp; iX++) {
+        for (int iX = xOff; iX < xOff + widthClamp; iX++) {
 
             int sampleX = (int) Math.floor(iX * scaleX);
 
-            int[] column = new int[height];
+            int[] column = new int[heightClamp];
 
-            for (int iY = 0; iY < height; iY++) {
+            for (int iY = yOff; iY < yOff + heightClamp; iY++) {
                 // Clip regions behind walls
                 if (iY + y < yTop[iX + x] || iY + y > yBot[iX + x] || iX + x < 0 || iX + x >= this.width) {
                     column[iY] = 0;
@@ -537,12 +546,12 @@ public class Renderer {
 
                 int sampleY = (int) Math.floor(iY * scaleY);
 
-                column[iY] = texture.getPixel(sampleX, sampleY);
+                column[iY - yOff] = texture.getPixel(sampleX, sampleY);
             }
 
             spriteColumns[iX - xOff] = column;
         }
-        return new Sprite(leftXClamp, y, widthClamp - (leftXClamp - x), height, spriteColumns);
+        return new Sprite(leftXClamp, yClamp, widthClamp - xOff, heightClamp - yOff, spriteColumns);
     }
 
     public void floorVLine(int x, int y1, int y2, Vec2f bl, Vec2f ur, float floorHeight, float angle, Vec2f pos) {
