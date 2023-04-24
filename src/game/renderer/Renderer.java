@@ -15,6 +15,7 @@ import java.awt.image.DataBufferInt;
 import java.awt.image.Raster;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Renderer {
 
@@ -126,13 +127,15 @@ public class Renderer {
         List<QueueItem> renderQueue = new ArrayList<>();
 
         // Entities in this sector
-        List<Entity> entities = world.entities.stream()
-                .filter(e -> (e.getSector() == world.sectors.indexOf(sector)))
-                .toList();
+        List<Entity> entities = new ArrayList<>();
+
+        for (Entity e : world.entities) {
+            if (e.getSector() == world.sectors.indexOf(sector)) entities.add(e);
+        }
+
         // TODO: Optimize so we don't recalculate same distance
         entities = entities.stream()
-                .sorted((a, b) -> (int) Math.ceil(a.getLocation().distanceTo(playerLocation) - b.getLocation().distanceTo(playerLocation)))
-                .toList();
+                .sorted((a, b) -> (int) Math.ceil(a.getLocation().distanceTo(playerLocation) - b.getLocation().distanceTo(playerLocation))).collect(Collectors.toList());
 
         List<Sprite> sprites = new ArrayList<>();
 

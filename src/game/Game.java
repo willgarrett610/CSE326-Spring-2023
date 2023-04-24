@@ -35,7 +35,7 @@ public class Game extends Canvas implements Runnable {
 
     private MouseListener mouseinputs;
 
-    private final MainMenu menu;
+    public final MainMenu menu;
 
     public Renderer renderer;
 
@@ -66,9 +66,9 @@ public class Game extends Canvas implements Runnable {
     boolean running = false;
 
     public boolean loading = true;
-    boolean paused = false;
+    public boolean paused = false;
 
-    boolean inSettings = false;
+    public boolean inSettings = false;
 
     public static void main(String[] args) {
         Game game = new Game();
