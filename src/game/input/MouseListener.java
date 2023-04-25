@@ -55,15 +55,6 @@ public class MouseListener extends MouseAdapter {
         return true;
     }
 
-    //Executes condition for exit button
-    public void pauseButtonCondition_exit(int x, int y, int w, int h) {
-        if (mouseClick != null) {
-            if (mouseClick.getX() > x & mouseClick.getY() > y & mouseClick.getX() < (x + w) & mouseClick.getY() < (y + h)) {
-                System.out.println("exit to menu");
-            }
-        }
-    }
-
     //Executes condition for quit button
     public void pauseButtonCondition_quit(int x, int y, int w, int h, JFrame frame) {
         if (mouseClick != null) {

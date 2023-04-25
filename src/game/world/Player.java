@@ -38,7 +38,7 @@ public class Player extends Moveable{
                 frameCount = 0;
             }
             //System.out.println(Math.floorDiv(frameCount, 3) % shootAnim.size());
-            System.out.println(frameCount);
+            //System.out.println(frameCount);
             return Math.floorDiv(frameCount, 3) % animLength;
         }
         return 0;

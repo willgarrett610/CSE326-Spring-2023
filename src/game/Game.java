@@ -254,11 +254,6 @@ public class Game extends Canvas implements Runnable {
     public void run() {
         long lastUpdate = System.currentTimeMillis();
 
-        JButton resumeButton = new JButton("floor_moon.png");
-        Box box = Box.createVerticalBox();
-        box.add(resumeButton);
-        this.frame.add(box);
-        box.grabFocus();
 
         while (running) {
             // Remain withing frame-rate cap
@@ -276,7 +271,7 @@ public class Game extends Canvas implements Runnable {
             } else if (paused & !inSettings) {
                 paused = mouseinputs.pauseButtonCondition_resume(200, 100, 400, 100, frame);
                 inSettings = pauseButtonCondition_settings(200, 210, 400, 100);
-                mouseinputs.pauseButtonCondition_exit(200, 320, 400, 100);
+                pauseButtonCondition_exit(200, 320, 400, 100);
                 mouseinputs.pauseButtonCondition_quit(200, 430, 400, 100, frame);
             } else if (paused & inSettings) {
                 inSettings = pauseButtonCondition_settingsExit(200, 500, 400, 100);
@@ -389,7 +384,6 @@ public class Game extends Canvas implements Runnable {
 
     public void shoot_func() {
         if (mouseinputs.mouseclicked == true) {
-            System.out.println("shooting");
             shoot_cond = true;
         }
         if(this.player != null) {
@@ -397,8 +391,20 @@ public class Game extends Canvas implements Runnable {
             drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 500, 350, 450, 450);
             drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 500, 350, 450, 450);
             if (shootFrame == 3) {
-                System.out.println("shot");
                 shoot_cond = false;
+            }
+        }
+    }
+
+    //Executes condition for exit button
+    public void pauseButtonCondition_exit(int x, int y, int w, int h) {
+
+        if (mouseinputs.mouseClick != null) {
+            if (mouseinputs.mouseClick.getX() > x & mouseinputs.mouseClick.getY() > y &
+                    mouseinputs.mouseClick.getX() < (x + w) & mouseinputs.mouseClick.getY() < (y + h)) {
+                this.loadWorld();
+                paused = false;
+                System.out.println("Reset level");
             }
         }
     }
