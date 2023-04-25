@@ -1,26 +1,24 @@
 package game.world.entity;
 
 import game.renderer.Texture;
+import game.world.Moveable;
 import game.world.Vec2f;
 import game.world.World;
 
 import java.awt.image.BufferedImage;
 
-public abstract class Entity {
+public abstract class Entity extends Moveable {
 
-    private World world;
-    private Vec2f location;
     private float height;
     private Vec2f size;
-    private int sector;
 
     public Entity(World world, Vec2f location, float height, Vec2f size, int sector) {
-        this.world = world;
-        this.location = location;
+        super(world, location, sector);
         this.height = height;
         this.size = size;
-        this.sector = sector;
     }
+
+    public abstract void tick();
 
     public abstract Texture getTexture();
 
@@ -44,7 +42,7 @@ public abstract class Entity {
         return this.sector;
     }
 
-    public void setLocation() {
+    public void setLocation(Vec2f location) {
         this.location = location;
     }
 

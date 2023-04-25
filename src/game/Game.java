@@ -7,15 +7,18 @@ import game.renderer.Renderer;
 import game.renderer.Texture;
 import game.world.MapLoader;
 import game.world.Player;
-import game.world.Vec2f;
 import game.world.World;
-import game.world.entity.Enemy;
+import game.world.entity.Alien;
+import game.world.entity.Entity;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Game extends Canvas implements Runnable {
 
@@ -32,7 +35,7 @@ public class Game extends Canvas implements Runnable {
 
     private MouseListener mouseinputs;
 
-    private final MainMenu menu;
+    public final MainMenu menu;
 
     public Renderer renderer;
 
@@ -53,6 +56,15 @@ public class Game extends Canvas implements Runnable {
 
     BufferedImage mainMenu;
 
+    List<Texture> alienAnim;
+
+    List<BufferedImage> gunAnim;
+
+    BufferedImage gun1;
+    BufferedImage gun2;
+    BufferedImage gun3;
+    boolean shoot_cond = false;
+    int shootFrame = 0;
 
     public JFrame frame;
 
@@ -61,9 +73,10 @@ public class Game extends Canvas implements Runnable {
     boolean running = false;
 
     public boolean loading = true;
-    boolean paused = false;
+    public boolean paused = false;
 
-    boolean inSettings = false;
+    public boolean inSettings = false;
+    public boolean inMainMenu = true;
 
     public static void main(String[] args) {
         Game game = new Game();
@@ -96,6 +109,33 @@ public class Game extends Canvas implements Runnable {
         Slider_Foreground = ResourceLoader.loadImage("SliderForeground.png");
         mainMenu = ResourceLoader.loadImage("mainmenu.png");
 
+        Texture alien15 = ResourceLoader.loadTexture("alien.png");
+        Texture alien24 = ResourceLoader.loadTexture("alien_walk_2_4.png");
+        Texture alien3 = ResourceLoader.loadTexture("alien_walk_3.png");
+        Texture alien68 = ResourceLoader.loadTexture("alien_walk_6_8.png");
+        Texture alien7 = ResourceLoader.loadTexture("alien_walk_7.png");
+
+        gun1 = ResourceLoader.loadImage("gunFrame1.png");
+        gun2 = ResourceLoader.loadImage("gunFrame2.png");
+        gun3 = ResourceLoader.loadImage("gunFrame3.png");
+
+        alienAnim = new ArrayList<>();
+
+        alienAnim.add(alien15);
+        alienAnim.add(alien24);
+        alienAnim.add(alien3);
+        alienAnim.add(alien24);
+        alienAnim.add(alien15);
+        alienAnim.add(alien68);
+        alienAnim.add(alien7);
+        alienAnim.add(alien68);
+
+        gunAnim = new ArrayList<>();
+
+        gunAnim.add(gun1);
+        gunAnim.add(gun3);
+        gunAnim.add(gun2);
+        gunAnim.add(gun1);
 
         // Remove cursor on window
 //        BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -132,9 +172,7 @@ public class Game extends Canvas implements Runnable {
 
         player = new Player(world);
 
-        Texture alien = ResourceLoader.loadTexture("alien.png");
-
-        Enemy enemy = new Enemy(world, player.location, 0, new Vec2f((float) 5.2, (float) 9.8), player.sector, alien);
+        Alien enemy = new Alien(world, player.location, player.sector, player, alienAnim);
 
         world.addEntity(enemy);
 
@@ -199,6 +237,11 @@ public class Game extends Canvas implements Runnable {
             mouseinputs.mouseClick.x = 0;
             mouseinputs.mouseClick.y = 0;
         }
+
+        // Update entities
+        for (Entity e : player.world.entities) {
+            e.tick();
+        }
     }
 
     public synchronized void startLoop() {
@@ -227,6 +270,9 @@ public class Game extends Canvas implements Runnable {
                 lastUpdate = System.currentTimeMillis();
                 render(timeElapsed);
 
+                if (!menu.active) {
+                    shoot_func();
+                }
             } else if (paused & !inSettings) {
                 paused = mouseinputs.pauseButtonCondition_resume(200, 100, 400, 100, frame);
                 inSettings = pauseButtonCondition_settings(200, 210, 400, 100);
@@ -339,6 +385,22 @@ public class Game extends Canvas implements Runnable {
             }
         }
         return volume;
+    }
+
+    public void shoot_func() {
+        if (mouseinputs.mouseclicked == true) {
+            System.out.println("shooting");
+            shoot_cond = true;
+        }
+        if(this.player != null) {
+            shootFrame = player.shoot_anim(gunAnim, shoot_cond);
+            drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 500, 350, 450, 450);
+            drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 500, 350, 450, 450);
+            if (shootFrame == 3) {
+                System.out.println("shot");
+                shoot_cond = false;
+            }
+        }
     }
 
     /**
