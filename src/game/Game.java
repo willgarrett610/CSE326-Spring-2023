@@ -270,7 +270,7 @@ public class Game extends Canvas implements Runnable {
                 render(timeElapsed);
 
                 if (!menu.active) {
-//                    shoot_func();
+                    shoot_func();
                 }
             } else if (paused & !inSettings) {
                 paused = mouseinputs.pauseButtonCondition_resume(200, 100, 400, 100, frame);
