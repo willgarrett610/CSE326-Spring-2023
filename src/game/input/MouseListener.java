@@ -55,13 +55,4 @@ public class MouseListener extends MouseAdapter {
         return true;
     }
 
-    //Executes condition for quit button
-    public void pauseButtonCondition_quit(int x, int y, int w, int h, JFrame frame) {
-        if (mouseClick != null) {
-            if (mouseClick.getX() > x & mouseClick.getY() > y & mouseClick.getX() < (x + w) & mouseClick.getY() < (y + h)) {
-                frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-                System.out.println("quit game");
-            }
-        }
-    }
 }

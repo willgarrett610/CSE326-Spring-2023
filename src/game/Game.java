@@ -13,6 +13,7 @@ import game.world.entity.Entity;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -47,9 +48,10 @@ public class Game extends Canvas implements Runnable {
     BufferedImage loadingImage;
     BufferedImage PauseButton_Resume;
     BufferedImage PauseButton_Settings;
-    BufferedImage PauseButton_Menu;
+    BufferedImage PauseButton_Reset;
     BufferedImage PauseButton_Quit;
     BufferedImage PauseButton_Exit;
+    BufferedImage PauseButton_Confirm;
     BufferedImage Pause_Background;
     BufferedImage Slider_Background;
     BufferedImage Slider_Foreground;
@@ -76,7 +78,8 @@ public class Game extends Canvas implements Runnable {
     public boolean paused = false;
 
     public boolean inSettings = false;
-    public boolean inMainMenu = true;
+    public boolean resetConfirmation = false;
+    public boolean quitConfirmation = false;
 
     public static void main(String[] args) {
         Game game = new Game();
@@ -101,9 +104,10 @@ public class Game extends Canvas implements Runnable {
         loadingImage = ResourceLoader.loadImage("loading.png");
         PauseButton_Resume = ResourceLoader.loadImage("ResumeButton.png");
         PauseButton_Settings = ResourceLoader.loadImage("SettingsButton.png");
-        PauseButton_Menu = ResourceLoader.loadImage("MenuButton.png");
+        PauseButton_Reset = ResourceLoader.loadImage("ResetButton.png");
         PauseButton_Quit = ResourceLoader.loadImage("QuitButton.png");
         PauseButton_Exit = ResourceLoader.loadImage("ExitButton.png");
+        PauseButton_Confirm = ResourceLoader.loadImage("ConfirmationButton.png");
         Pause_Background = ResourceLoader.loadImage("PauseBackground.png");
         Slider_Background = ResourceLoader.loadImage("SliderBackground.png");
         Slider_Foreground = ResourceLoader.loadImage("SliderForeground.png");
@@ -271,8 +275,8 @@ public class Game extends Canvas implements Runnable {
             } else if (paused & !inSettings) {
                 paused = mouseinputs.pauseButtonCondition_resume(200, 100, 400, 100, frame);
                 inSettings = pauseButtonCondition_settings(200, 210, 400, 100);
-                pauseButtonCondition_exit(200, 320, 400, 100);
-                mouseinputs.pauseButtonCondition_quit(200, 430, 400, 100, frame);
+                pauseButtonCondition_reset(200, 320, 400, 100);
+                pauseButtonCondition_quit(200, 430, 400, 100, frame);
             } else if (paused & inSettings) {
                 inSettings = pauseButtonCondition_settingsExit(200, 500, 400, 100);
                 volume = pauseButtonCondition_settingsVolume(200, 320, 400, 30, volume);
@@ -305,12 +309,15 @@ public class Game extends Canvas implements Runnable {
             drawImage(getBufferStrategy(), Pause_Background, 50, 50, 700, 700);
             drawImage(getBufferStrategy(), PauseButton_Resume, 200, 100, 400, 100);
             drawImage(getBufferStrategy(), PauseButton_Settings, 200, 210, 400, 100);
-            drawImage(getBufferStrategy(), PauseButton_Menu, 200, 320, 400, 100);
+            drawImage(getBufferStrategy(), PauseButton_Reset, 200, 320, 400, 100);
             drawImage(getBufferStrategy(), PauseButton_Quit, 200, 430, 400, 100);
             drawImage(getBufferStrategy(), PauseButton_Quit, 200, 430, 400, 100);
 
             //Return cursor
             frame.getContentPane().setCursor(Cursor.getDefaultCursor());
+
+            resetConfirmation = false;
+            quitConfirmation = false;
 
             System.out.println("paused");
             return true;
@@ -328,7 +335,6 @@ public class Game extends Canvas implements Runnable {
                 //Draw settings menu
                 drawImage(getBufferStrategy(), Pause_Background, 50, 50, 700, 700);
                 drawImage(getBufferStrategy(), PauseButton_Exit, 200, 500, 400, 100);
-                //drawImage(getBufferStrategy(), PauseButton_Exit, 200, 500, 400, 100);
 
                 int sliderWidth = 400/100 * ((int) volume);
 
@@ -336,6 +342,10 @@ public class Game extends Canvas implements Runnable {
                 drawImage(getBufferStrategy(), Slider_Background, 200, 300, 400, 10);
                 drawImage(getBufferStrategy(), Slider_Foreground, 200, 300, sliderWidth, 10);
                 drawImage(getBufferStrategy(), Slider_Foreground, 200, 300, sliderWidth, 10);
+
+                //reset confirmation conditions
+                resetConfirmation = false;
+                quitConfirmation = false;
 
                 return true;
             }
@@ -353,7 +363,7 @@ public class Game extends Canvas implements Runnable {
                 drawImage(getBufferStrategy(), Pause_Background, 50, 50, 700, 700);
                 drawImage(getBufferStrategy(), PauseButton_Resume, 200, 100, 400, 100);
                 drawImage(getBufferStrategy(), PauseButton_Settings, 200, 210, 400, 100);
-                drawImage(getBufferStrategy(), PauseButton_Menu, 200, 320, 400, 100);
+                drawImage(getBufferStrategy(), PauseButton_Reset, 200, 320, 400, 100);
                 drawImage(getBufferStrategy(), PauseButton_Quit, 200, 430, 400, 100);
                 drawImage(getBufferStrategy(), PauseButton_Quit, 200, 430, 400, 100);
 
@@ -388,23 +398,56 @@ public class Game extends Canvas implements Runnable {
         }
         if(this.player != null) {
             shootFrame = player.shoot_anim(gunAnim, shoot_cond);
-            drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 500, 350, 450, 450);
-            drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 500, 350, 450, 450);
-            if (shootFrame == 3) {
+            if (shootFrame == 0) {
+                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 400, 350, 450, 450);
+                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 400, 350, 450, 450);
+            } else if (shootFrame == 1) {
+                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 430, 300, 540, 540);
+                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 430, 300, 540, 540);
+            } else if (shootFrame == 2) {
+                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 440, 290, 550, 550);
+                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 440, 290, 550, 550);
+            } else if (shootFrame == 3) {
+                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 410, 340, 470, 470);
+                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 410, 340, 470, 470);
                 shoot_cond = false;
             }
         }
     }
 
     //Executes condition for exit button
-    public void pauseButtonCondition_exit(int x, int y, int w, int h) {
+    public void pauseButtonCondition_reset(int x, int y, int w, int h) {
 
         if (mouseinputs.mouseClick != null) {
             if (mouseinputs.mouseClick.getX() > x & mouseinputs.mouseClick.getY() > y &
                     mouseinputs.mouseClick.getX() < (x + w) & mouseinputs.mouseClick.getY() < (y + h)) {
-                this.loadWorld();
-                paused = false;
-                System.out.println("Reset level");
+                if (resetConfirmation == false) {
+                    drawImage(getBufferStrategy(), PauseButton_Confirm, 200, 320, 400, 100);
+                    drawImage(getBufferStrategy(), PauseButton_Confirm, 200, 320, 400, 100);
+                    resetConfirmation = true;
+                } else {
+                    this.loadWorld();
+                    paused = false;
+                    resetConfirmation = false;
+                    System.out.println("Reset level");
+                }
+            }
+        }
+    }
+
+    //Executes condition for quit button
+    public void pauseButtonCondition_quit(int x, int y, int w, int h, JFrame frame) {
+        if (mouseinputs.mouseClick != null) {
+            if (mouseinputs.mouseClick.getX() > x & mouseinputs.mouseClick.getY() > y &
+                    mouseinputs.mouseClick.getX() < (x + w) & mouseinputs.mouseClick.getY() < (y + h)) {
+                if (quitConfirmation == false) {
+                    drawImage(getBufferStrategy(), PauseButton_Confirm, 200, 430, 400, 100);
+                    drawImage(getBufferStrategy(), PauseButton_Confirm, 200, 430, 400, 100);
+                    quitConfirmation = true;
+                } else {
+                    frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+                    System.out.println("quit game");
+                }
             }
         }
     }
