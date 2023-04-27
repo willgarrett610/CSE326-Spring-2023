@@ -5,6 +5,7 @@ import game.input.MouseListener;
 import game.menu.MainMenu;
 import game.renderer.Renderer;
 import game.renderer.Texture;
+import game.settings.SoundControl;
 import game.world.MapLoader;
 import game.world.Player;
 import game.world.World;
@@ -35,6 +36,8 @@ public class Game extends Canvas implements Runnable {
     private InputListener inputs;
 
     private MouseListener mouseinputs;
+
+    private SoundControl sound;
 
     public final MainMenu menu;
 
@@ -154,6 +157,8 @@ public class Game extends Canvas implements Runnable {
             System.exit(0);
         }
 
+        sound = new SoundControl();
+
         mouseinputs = new MouseListener();
 
         this.addKeyListener(inputs);
@@ -167,6 +172,8 @@ public class Game extends Canvas implements Runnable {
 
         this.addMouseListener(menu);
         this.addMouseMotionListener(menu);
+
+
     }
 
     public void loadWorld() {
@@ -394,6 +401,9 @@ public class Game extends Canvas implements Runnable {
 
     public void shoot_func() {
         if (mouseinputs.mouseclicked == true) {
+            if (shoot_cond == false) {
+                sound.playSound_shoot();
+            }
             shoot_cond = true;
         }
         if(this.player != null) {
