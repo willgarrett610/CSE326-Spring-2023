@@ -25,6 +25,8 @@ public class Alien extends Entity {
 
     @Override
     public void tick() {
+        if (this.location.distanceTo(player.location) <= 10) return;
+
         int animLength = moveAnim.size();
         frameCount++;
         // About to overflow and at new frame loop
