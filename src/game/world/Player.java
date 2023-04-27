@@ -1,6 +1,8 @@
 package game.world;
 
 import game.renderer.Texture;
+import game.world.entity.Alien;
+import game.world.entity.Entity;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -39,6 +41,7 @@ public class Player extends Moveable{
                     frameCount > ((animLength - 1) * 3)) {
                 frameCount = 0;
             }
+
             //System.out.println(Math.floorDiv(frameCount, 3) % shootAnim.size());
             //System.out.println(frameCount);
             return Math.floorDiv(frameCount, 3) % animLength;

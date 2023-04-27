@@ -410,6 +410,18 @@ public class Game extends Canvas implements Runnable {
         if (mouseinputs.mouseclicked == true) {
             if (shoot_cond == false) {
                 sound.playSound_shoot();
+
+                System.out.println("Shoot");
+
+                // Damage alien
+                for (int i = 0; i < player.world.entities.size(); i++) {
+                    Entity e = player.world.entities.get(i);
+                    // TODO: Check if player was aiming at alien
+                    if (e instanceof Alien) {
+                        Alien alien = (Alien) e;
+                        alien.damage(4);
+                    }
+                }
             }
             shoot_cond = true;
         }

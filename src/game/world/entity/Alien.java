@@ -5,6 +5,7 @@ import game.world.Player;
 import game.world.Vec2f;
 import game.world.World;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 public class Alien extends Entity {
@@ -17,10 +18,14 @@ public class Alien extends Entity {
 
     private int frameCount = 0;
 
+    public static final int maxHealth = 50;
+    private int health;
+
     public Alien(World world, Vec2f location, int sector, Player player, List<Texture> moveAnim) {
         super(world, location, 0, new Vec2f((float) 5.2, (float) 9.8), sector);
         this.player = player;
         this.moveAnim = moveAnim;
+        this.health = maxHealth;
     }
 
     @Override
@@ -39,7 +44,17 @@ public class Alien extends Entity {
 
     @Override
     public Texture getTexture() {
-        return moveAnim.get(Math.floorDiv(frameCount, 5)%moveAnim.size());
+        Texture texture = moveAnim.get(Math.floorDiv(frameCount, 5)%moveAnim.size()).clone();
+
+        int healthBarLevel = (int) Math.floor(((float)health/(float)maxHealth) * texture.getWidth());
+
+        for (int x = 0; x < texture.getWidth(); x++) {
+            for (int y = 0; y < 5; y++) {
+                int color = x < healthBarLevel ? 0xffff0000 : 0xff000000;
+                texture.setPixel(x,y,color);
+            }
+        }
+        return texture;
     }
 
     public void moveTowardPlayer(Player player) {
@@ -48,6 +63,17 @@ public class Alien extends Entity {
         Vec2f vel = this.getLocation().pointToNormalized(player.location);
         vel = vel.multiply(SPEED, SPEED);
         this.move(this.getLocation().add(vel));
+    }
+
+    public void kill() {
+        this.world.removeEntity(this);
+    }
+
+    public void damage(int damage) {
+        this.health -= damage;
+        if (this.health <= 0) {
+            this.kill();
+        }
     }
 
 }

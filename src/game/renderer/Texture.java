@@ -26,6 +26,13 @@ public class Texture {
         }
     }
 
+    public Texture(int[][] columns) {
+        this.width = columns.length;
+        this.height = columns[0].length;
+
+        this.columns = columns;
+    }
+
     public int getWidth() {
         return width;
     }
@@ -40,6 +47,20 @@ public class Texture {
 
     public int getPixel(int x, int y) {
         return columns[x][y];
+    }
+
+    public void setPixel(int x, int y, int color) {
+        this.columns[x][y] = color;
+    }
+
+    public Texture clone() {
+        int[][] columns = new int[this.width][];
+        for (int i = 0; i < this.columns.length; i++) {
+            int[] col = new int[this.height];
+            System.arraycopy(this.columns[i], 0, col, 0,this.height);
+            columns[i] = col;
+        }
+        return new Texture(columns);
     }
 
 }
