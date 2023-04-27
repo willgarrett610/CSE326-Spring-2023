@@ -18,6 +18,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -86,7 +87,9 @@ public class Game extends Canvas implements Runnable {
     public static void main(String[] args) {
         Game game = new Game();
         game.startLoop();
+        game.loadResources();
         game.loadWorld();
+        game.loading = false;
     }
 
     private Game() {
@@ -104,44 +107,6 @@ public class Game extends Canvas implements Runnable {
         frame.setVisible(true);
 
         loadingImage = ResourceLoader.loadImage("loading.png");
-        PauseButton_Resume = ResourceLoader.loadImage("ResumeButton.png");
-        PauseButton_Settings = ResourceLoader.loadImage("SettingsButton.png");
-        PauseButton_Reset = ResourceLoader.loadImage("ResetButton.png");
-        PauseButton_Quit = ResourceLoader.loadImage("QuitButton.png");
-        PauseButton_Exit = ResourceLoader.loadImage("ExitButton.png");
-        PauseButton_Confirm = ResourceLoader.loadImage("ConfirmationButton.png");
-        Pause_Background = ResourceLoader.loadImage("PauseBackground.png");
-        Slider_Background = ResourceLoader.loadImage("SliderBackground.png");
-        Slider_Foreground = ResourceLoader.loadImage("SliderForeground.png");
-        mainMenu = ResourceLoader.loadImage("mainmenu.png");
-
-        Texture alien15 = ResourceLoader.loadTexture("alien.png");
-        Texture alien24 = ResourceLoader.loadTexture("alien_walk_2_4.png");
-        Texture alien3 = ResourceLoader.loadTexture("alien_walk_3.png");
-        Texture alien68 = ResourceLoader.loadTexture("alien_walk_6_8.png");
-        Texture alien7 = ResourceLoader.loadTexture("alien_walk_7.png");
-
-        gun1 = ResourceLoader.loadImage("gunFrame1.png");
-        gun2 = ResourceLoader.loadImage("gunFrame2.png");
-        gun3 = ResourceLoader.loadImage("gunFrame3.png");
-
-        alienAnim = new ArrayList<>();
-
-        alienAnim.add(alien15);
-        alienAnim.add(alien24);
-        alienAnim.add(alien3);
-        alienAnim.add(alien24);
-        alienAnim.add(alien15);
-        alienAnim.add(alien68);
-        alienAnim.add(alien7);
-        alienAnim.add(alien68);
-
-        gunAnim = new ArrayList<>();
-
-        gunAnim.add(gun1);
-        gunAnim.add(gun3);
-        gunAnim.add(gun2);
-        gunAnim.add(gun1);
 
         // Remove cursor on window
 //        BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -183,60 +148,72 @@ public class Game extends Canvas implements Runnable {
         world.addEntity(enemy);
 
         renderer.setPlayer(player);
-
-        loading = false;
     }
 
-    public void drawImage(BufferStrategy bufStrat, BufferedImage image, int x, int y, int w, int h) {
-        Graphics g = bufStrat.getDrawGraphics();
+    public void loadResources() {
+        PauseButton_Resume = ResourceLoader.loadImage("ResumeButton.png");
+        PauseButton_Settings = ResourceLoader.loadImage("SettingsButton.png");
+        PauseButton_Reset = ResourceLoader.loadImage("ResetButton.png");
+        PauseButton_Quit = ResourceLoader.loadImage("QuitButton.png");
+        PauseButton_Exit = ResourceLoader.loadImage("ExitButton.png");
+        PauseButton_Confirm = ResourceLoader.loadImage("ConfirmationButton.png");
+        Pause_Background = ResourceLoader.loadImage("PauseBackground.png");
+        Slider_Background = ResourceLoader.loadImage("SliderBackground.png");
+        Slider_Foreground = ResourceLoader.loadImage("SliderForeground.png");
+        mainMenu = ResourceLoader.loadImage("mainmenu.png");
 
-        do {
-            try {
-                g.drawImage(image, x, y, w, h, null);
-            } finally {
-                g.dispose();
-            }
-            bufStrat.show();
-        } while (bufStrat.contentsLost());
+        Texture alien15 = ResourceLoader.loadTexture("alien.png");
+        Texture alien24 = ResourceLoader.loadTexture("alien_walk_2_4.png");
+        Texture alien3 = ResourceLoader.loadTexture("alien_walk_3.png");
+        Texture alien68 = ResourceLoader.loadTexture("alien_walk_6_8.png");
+        Texture alien7 = ResourceLoader.loadTexture("alien_walk_7.png");
+
+        gun1 = ResourceLoader.loadImage("gunFrame1.png");
+        gun2 = ResourceLoader.loadImage("gunFrame2.png");
+        gun3 = ResourceLoader.loadImage("gunFrame3.png");
+
+        alienAnim = new ArrayList<>();
+
+        alienAnim.add(alien15);
+        alienAnim.add(alien24);
+        alienAnim.add(alien3);
+        alienAnim.add(alien24);
+        alienAnim.add(alien15);
+        alienAnim.add(alien68);
+        alienAnim.add(alien7);
+        alienAnim.add(alien68);
+
+        gunAnim = new ArrayList<>();
+
+        gunAnim.add(gun1);
+        gunAnim.add(gun3);
+        gunAnim.add(gun2);
+        gunAnim.add(gun1);
     }
 
-    public void render(float timeElapsed) {
-        BufferStrategy bufStrat = getBufferStrategy();
-        if (bufStrat == null) {
-            this.createBufferStrategy(3);
-            return;
-        }
-
+    public void render(Graphics g, float timeElapsed) {
         if (loading) {
-            drawImage(bufStrat, loadingImage,0, 0, this.getWidth(), this.getHeight());
+            g.drawImage(loadingImage,0, 0, this.getWidth(), this.getHeight(), null);
             return;
         }
 
-        do {
-                renderer.render();
-                System.arraycopy(renderer.screen, 0, screen, 0, width * height);
-                Graphics g = bufStrat.getDrawGraphics();
-                try {
-                    g.drawImage(buf, 0, 0, null);
-                    drawMenu(mainMenu, g);
+        renderer.render();
+        System.arraycopy(renderer.screen, 0, screen, 0, width * height);
 
-                    int realFPS = Math.round(1000f / (float) timeElapsed);
-                    g.setColor(Color.BLACK);
-                    g.setFont(new Font("Arial", Font.PLAIN, 16));
-                    g.drawString("FPS: " + realFPS, 710, 50);
-                } finally {
-                    g.dispose();
-                }
-                bufStrat.show();
-        } while(bufStrat.contentsLost());
+        drawMenu(mainMenu, g);
+
+        int realFPS = Math.round(1000f / (float) timeElapsed);
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.PLAIN, 16));
+        g.drawString("FPS: " + realFPS, 710, 50);
     }
 
-    public void update() {
+    public void update(Graphics g) {
         //Character cannot move if game is paused
         if (!paused) {
             inputs.checkInput();
         }
-        paused = pauseButton(paused, this.frame);
+        paused = pauseButton(g, paused, this.frame);
         inputs.keys_push.clear();
         mouseinputs.mouseclicked = false;
         if (mouseinputs.mouseClick != null) {
@@ -256,12 +233,37 @@ public class Game extends Canvas implements Runnable {
         thread.start();
     }
 
+    public BufferStrategy startBuffer() {
+        BufferStrategy bufStrat = this.getBufferStrategy();
+        if (bufStrat == null) {
+            this.createBufferStrategy(3);
+            return this.getBufferStrategy();
+        }
+        return bufStrat;
+    }
+
+    public void flushBuffer(BufferedImage image, BufferStrategy bufStrat) {
+        // Draw image and flush graphics buffer
+        do {
+            Graphics bufG = bufStrat.getDrawGraphics();
+            try {
+                bufG.drawImage(image, 0, 0, null);
+            } finally {
+                bufG.dispose();
+            }
+            bufStrat.show();
+        } while(bufStrat.contentsLost());
+    }
+
     @Override
     public void run() {
         long lastUpdate = System.currentTimeMillis();
 
-
         while (running) {
+            BufferStrategy bufStrat = startBuffer();
+
+            Graphics g = buf.createGraphics();
+
             // Remain withing frame-rate cap
             mousePos = MouseInfo.getPointerInfo().getLocation();
             mousePos = new Point(mousePos.x - frame.getLocation().x, mousePos.y - frame.getLocation().y);
@@ -269,28 +271,32 @@ public class Game extends Canvas implements Runnable {
             long timeElapsed = System.currentTimeMillis() - lastUpdate;
             if ((timeElapsed >= 1000 / FPS) & !paused) {
                 lastUpdate = System.currentTimeMillis();
-                render(timeElapsed);
+                render(g, timeElapsed);
 
                 if (!menu.active) {
-                    shoot_func();
+                    shoot_func(g);
                 }
             } else if (paused & !inSettings) {
                 paused = mouseinputs.pauseButtonCondition_resume(200, 100, 400, 100, frame);
-                inSettings = pauseButtonCondition_settings(200, 210, 400, 100);
-                pauseButtonCondition_reset(200, 320, 400, 100);
-                pauseButtonCondition_quit(200, 430, 400, 100, frame);
+                inSettings = pauseButtonCondition_settings(g, 200, 210, 400, 100);
+                pauseButtonCondition_reset(g, 200, 320, 400, 100);
+                pauseButtonCondition_quit(g, 200, 430, 400, 100, frame);
             } else if (paused & inSettings) {
-                inSettings = pauseButtonCondition_settingsExit(200, 500, 400, 100);
-                volume = pauseButtonCondition_settingsVolume(200, 320, 400, 30, volume);
+                inSettings = pauseButtonCondition_settingsExit(g, 200, 500, 400, 100);
+                volume = pauseButtonCondition_settingsVolume(g, 200, 320, 400, 30, volume);
             }
 
             if ((timeElapsed >= 1000 / FPS) & !loading) {
-                update();
+                update(g);
             }
+
+            g.dispose();
+
+            flushBuffer(buf, bufStrat);
         }
     }
 
-    public boolean pauseButton(boolean paused, JFrame frame) {
+    public boolean pauseButton(Graphics g, boolean paused, JFrame frame) {
         //var pauseIcon = new ImageIcon("res/wall.png");
         //var pauseLabel = new JLabel(pauseIcon);
         //System.out.println(KeyEvent.KEY_PRESSED);
@@ -308,12 +314,11 @@ public class Game extends Canvas implements Runnable {
             return false;
         } else if (!paused & inputs.keys_push.contains(80)) {
             //Draws pause buttons
-            drawImage(getBufferStrategy(), Pause_Background, 50, 50, 700, 700);
-            drawImage(getBufferStrategy(), PauseButton_Resume, 200, 100, 400, 100);
-            drawImage(getBufferStrategy(), PauseButton_Settings, 200, 210, 400, 100);
-            drawImage(getBufferStrategy(), PauseButton_Reset, 200, 320, 400, 100);
-            drawImage(getBufferStrategy(), PauseButton_Quit, 200, 430, 400, 100);
-            drawImage(getBufferStrategy(), PauseButton_Quit, 200, 430, 400, 100);
+            g.drawImage(Pause_Background, 50, 50, 700, 700, null);
+            g.drawImage(PauseButton_Resume, 200, 100, 400, 100, null);
+            g.drawImage(PauseButton_Settings, 200, 210, 400, 100, null);
+            g.drawImage(PauseButton_Reset, 200, 320, 400, 100, null);
+            g.drawImage(PauseButton_Quit, 200, 430, 400, 100, null);
 
             //Return cursor
             frame.getContentPane().setCursor(Cursor.getDefaultCursor());
@@ -324,26 +329,26 @@ public class Game extends Canvas implements Runnable {
             System.out.println("paused");
             return true;
         }
+
         return paused;
     }
 
     //Executes condition for settings button
-    public boolean pauseButtonCondition_settings(int x, int y, int w, int h) {
+    public boolean pauseButtonCondition_settings(Graphics g, int x, int y, int w, int h) {
         if (mouseinputs.mouseClick != null) {
             if (mouseinputs.mouseClick.getX() > x & mouseinputs.mouseClick.getY() > y &
                     mouseinputs.mouseClick.getX() < (x + w) & mouseinputs.mouseClick.getY() < (y + h)) {
                 System.out.println("settings");
 
                 //Draw settings menu
-                drawImage(getBufferStrategy(), Pause_Background, 50, 50, 700, 700);
-                drawImage(getBufferStrategy(), PauseButton_Exit, 200, 500, 400, 100);
+                g.drawImage(Pause_Background, 50, 50, 700, 700,null);
+                g.drawImage(PauseButton_Exit, 200, 500, 400, 100, null);
 
                 int sliderWidth = 400/100 * ((int) volume);
 
                 //Draw sliders
-                drawImage(getBufferStrategy(), Slider_Background, 200, 300, 400, 10);
-                drawImage(getBufferStrategy(), Slider_Foreground, 200, 300, sliderWidth, 10);
-                drawImage(getBufferStrategy(), Slider_Foreground, 200, 300, sliderWidth, 10);
+                g.drawImage(Slider_Background, 200, 300, 400, 10, null);
+                g.drawImage(Slider_Foreground, 200, 300, sliderWidth, 10, null);
 
                 //reset confirmation conditions
                 resetConfirmation = false;
@@ -352,30 +357,31 @@ public class Game extends Canvas implements Runnable {
                 return true;
             }
         }
+
         return false;
     }
 
-    public boolean pauseButtonCondition_settingsExit(int x, int y, int w, int h) {
+    public boolean pauseButtonCondition_settingsExit(Graphics g, int x, int y, int w, int h) {
         if (mouseinputs.mouseClick != null) {
             if (mouseinputs.mouseClick.getX() > x & mouseinputs.mouseClick.getY() > y &
                     mouseinputs.mouseClick.getX() < (x + w) & mouseinputs.mouseClick.getY() < (y + h)) {
                 System.out.println("settings exit");
 
                 //Draws pause buttons
-                drawImage(getBufferStrategy(), Pause_Background, 50, 50, 700, 700);
-                drawImage(getBufferStrategy(), PauseButton_Resume, 200, 100, 400, 100);
-                drawImage(getBufferStrategy(), PauseButton_Settings, 200, 210, 400, 100);
-                drawImage(getBufferStrategy(), PauseButton_Reset, 200, 320, 400, 100);
-                drawImage(getBufferStrategy(), PauseButton_Quit, 200, 430, 400, 100);
-                drawImage(getBufferStrategy(), PauseButton_Quit, 200, 430, 400, 100);
+                g.drawImage(Pause_Background, 50, 50, 700, 700, null);
+                g.drawImage(PauseButton_Resume, 200, 100, 400, 100, null);
+                g.drawImage(PauseButton_Settings, 200, 210, 400, 100, null);
+                g.drawImage(PauseButton_Reset, 200, 320, 400, 100, null);
+                g.drawImage(PauseButton_Quit, 200, 430, 400, 100, null);
 
                 return false;
             }
         }
+
         return true;
     }
 
-    public float pauseButtonCondition_settingsVolume(int x, int y, int w, int h, float v) {
+    public float pauseButtonCondition_settingsVolume(Graphics g, int x, int y, int w, int h, float v) {
         float volume = v;
 
         if (mouseinputs.mouseHeld) {
@@ -386,46 +392,40 @@ public class Game extends Canvas implements Runnable {
                 int sliderWidth = 400/100 * ((int) volume);
 
                 //Draw sliders
-                drawImage(getBufferStrategy(), Slider_Background, 200, 300, 400, 10);
-                drawImage(getBufferStrategy(), Slider_Foreground, 200, 300, sliderWidth, 10);
-                drawImage(getBufferStrategy(), Slider_Foreground, 200, 300, sliderWidth, 10);
+                g.drawImage(Slider_Background, 200, 300, 400, 10, null);
+                g.drawImage(Slider_Foreground, 200, 300, sliderWidth, 10, null);
             }
         }
         return volume;
     }
 
-    public void shoot_func() {
+    public void shoot_func(Graphics g) {
         if (mouseinputs.mouseclicked == true) {
             shoot_cond = true;
         }
         if(this.player != null) {
             shootFrame = player.shoot_anim(gunAnim, shoot_cond);
             if (shootFrame == 0) {
-                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 400, 350, 450, 450);
-                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 400, 350, 450, 450);
+                g.drawImage(gunAnim.get(shootFrame), 400, 350, 450, 450, null);
             } else if (shootFrame == 1) {
-                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 430, 300, 540, 540);
-                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 430, 300, 540, 540);
+                g.drawImage(gunAnim.get(shootFrame), 430, 300, 540, 540, null);
             } else if (shootFrame == 2) {
-                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 440, 290, 550, 550);
-                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 440, 290, 550, 550);
+                g.drawImage(gunAnim.get(shootFrame), 440, 290, 550, 550, null);
             } else if (shootFrame == 3) {
-                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 410, 340, 470, 470);
-                drawImage(getBufferStrategy(), gunAnim.get(shootFrame), 410, 340, 470, 470);
+                g.drawImage(gunAnim.get(shootFrame), 410, 340, 470, 470, null);
                 shoot_cond = false;
             }
         }
     }
 
     //Executes condition for exit button
-    public void pauseButtonCondition_reset(int x, int y, int w, int h) {
-
+    public void pauseButtonCondition_reset(Graphics g, int x, int y, int w, int h) {
         if (mouseinputs.mouseClick != null) {
             if (mouseinputs.mouseClick.getX() > x & mouseinputs.mouseClick.getY() > y &
                     mouseinputs.mouseClick.getX() < (x + w) & mouseinputs.mouseClick.getY() < (y + h)) {
                 if (resetConfirmation == false) {
-                    drawImage(getBufferStrategy(), PauseButton_Confirm, 200, 320, 400, 100);
-                    drawImage(getBufferStrategy(), PauseButton_Confirm, 200, 320, 400, 100);
+                    g.drawImage(PauseButton_Confirm, 200, 320, 400, 100, null);
+                    g.drawImage(PauseButton_Confirm, 200, 320, 400, 100, null);
                     resetConfirmation = true;
                 } else {
                     this.loadWorld();
@@ -438,13 +438,12 @@ public class Game extends Canvas implements Runnable {
     }
 
     //Executes condition for quit button
-    public void pauseButtonCondition_quit(int x, int y, int w, int h, JFrame frame) {
+    public void pauseButtonCondition_quit(Graphics g, int x, int y, int w, int h, JFrame frame) {
         if (mouseinputs.mouseClick != null) {
             if (mouseinputs.mouseClick.getX() > x & mouseinputs.mouseClick.getY() > y &
                     mouseinputs.mouseClick.getX() < (x + w) & mouseinputs.mouseClick.getY() < (y + h)) {
                 if (quitConfirmation == false) {
-                    drawImage(getBufferStrategy(), PauseButton_Confirm, 200, 430, 400, 100);
-                    drawImage(getBufferStrategy(), PauseButton_Confirm, 200, 430, 400, 100);
+                    g.drawImage(PauseButton_Confirm, 200, 430, 400, 100, null);
                     quitConfirmation = true;
                 } else {
                     frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
