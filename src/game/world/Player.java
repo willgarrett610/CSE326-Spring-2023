@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Player extends Moveable{
     public float angle;
+    public int health;
 
     //Gun frame information
     List<Texture> shootAnim;
@@ -15,6 +16,7 @@ public class Player extends Moveable{
     public Player(World world) {
         super(world, world.startLocation, world.startSector);
         this.angle = world.startAngle;
+        this.health = 100;
     }
 
     public void setWorld(World world) {

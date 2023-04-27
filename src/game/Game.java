@@ -3,6 +3,7 @@ package game;
 import game.input.InputListener;
 import game.input.MouseListener;
 import game.menu.MainMenu;
+import game.menu.UI;
 import game.renderer.Renderer;
 import game.renderer.Texture;
 import game.world.MapLoader;
@@ -37,6 +38,7 @@ public class Game extends Canvas implements Runnable {
     private MouseListener mouseinputs;
 
     public final MainMenu menu;
+    private UI ui;
 
     public Renderer renderer;
 
@@ -469,6 +471,5 @@ public class Game extends Canvas implements Runnable {
                 cursorImg, new Point(0, 0), "blank cursor");
             frame.getContentPane().setCursor(blankCursor);
         }
-
     }
 }
