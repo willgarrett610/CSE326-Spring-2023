@@ -133,10 +133,10 @@ public class MainMenu extends MouseListener {
     @Override
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
-        if (startBtn.contains(p)) {
+        if (startBtn.contains(p) & active) {
             active = false;
             System.out.println("Starting game");
-        } else if (exitBtn.contains(p)) {
+        } else if (exitBtn.contains(p) & active) {
             System.out.println("Exiting game");
             System.exit(0);
         }
