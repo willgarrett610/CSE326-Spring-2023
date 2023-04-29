@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static java.lang.Math.*;
+
 public class Game extends Canvas implements Runnable {
 
     static final int FPS = 120;
@@ -411,7 +413,9 @@ public class Game extends Canvas implements Runnable {
             if (shoot_cond == false) {
                 sound.playSound_shoot();
 
-                System.out.println("Shoot");
+                //System.out.println("Shoot");
+                //System.out.println(player.angle);
+                //System.out.println(player.location);
 
                 // Damage alien
                 for (int i = 0; i < player.world.entities.size(); i++) {
@@ -419,7 +423,36 @@ public class Game extends Canvas implements Runnable {
                     // TODO: Check if player was aiming at alien
                     if (e instanceof Alien) {
                         Alien alien = (Alien) e;
-                        alien.damage(4);
+
+                        float xDiff = player.location.x - alien.location.x;
+                        float yDiff = player.location.y - alien.location.y;
+                        double distance = sqrt((xDiff * xDiff) + (yDiff * yDiff));
+                        double shootArc = (10 / distance) * 20; //Adjust for wider or smaller angle
+
+                        float shootAng = (float) toDegrees(atan(xDiff / yDiff));
+
+                        float playerShootAng = player.angle % 360;
+                        if (player.angle < 0) {
+                            playerShootAng = 360 + (player.angle % 360);
+                        }
+
+                        if (xDiff < 0 & yDiff < 0) {
+
+                        } else if (xDiff > 0 & yDiff < 0) {
+                            shootAng += 360;
+                        } else if (xDiff < 0 & yDiff > 0) {
+                            shootAng += 180;
+                        } else if (xDiff > 0 & yDiff > 0) {
+                            shootAng += 180;
+                        }
+
+                        //System.out.println(shootAng - playerShootAng);
+
+                        if ((shootAng - playerShootAng) >= -shootArc &
+                                (shootAng - playerShootAng) <= shootArc) {
+                            System.out.println("Hit!");
+                            alien.damage(4);
+                        }
                     }
                 }
             }

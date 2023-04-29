@@ -11,8 +11,6 @@ public class Player extends Moveable{
     public float angle;
     public int health;
 
-    //Gun frame information
-    List<Texture> shootAnim;
     private int frameCount = 0;
 
     public Player(World world) {
@@ -26,10 +24,6 @@ public class Player extends Moveable{
         this.location = world.startLocation;
         this.sector = world.startSector;
         this.angle = world.startAngle;
-    }
-
-    public void shoot() {
-        System.out.println("Bang!");
     }
 
     public int shoot_anim(List<BufferedImage> shootAnim, boolean shooting) {
