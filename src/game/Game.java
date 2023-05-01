@@ -176,6 +176,16 @@ public class Game extends Canvas implements Runnable {
         Texture alien3 = ResourceLoader.loadTexture("alien_walk_3.png");
         Texture alien68 = ResourceLoader.loadTexture("alien_walk_6_8.png");
         Texture alien7 = ResourceLoader.loadTexture("alien_walk_7.png");
+        Texture alien15_dmg1 = ResourceLoader.loadTexture("alien_dmg1.png");
+        Texture alien24_dmg1 = ResourceLoader.loadTexture("alien_dmg1_walk_2_4.png");
+        Texture alien3_dmg1 = ResourceLoader.loadTexture("alien_dmg1_walk_3.png");
+        Texture alien68_dmg1 = ResourceLoader.loadTexture("alien_dmg1_walk_6_8.png");
+        Texture alien7_dmg1 = ResourceLoader.loadTexture("alien_dmg1_walk_7.png");
+        Texture alien15_dmg2 = ResourceLoader.loadTexture("alien_dmg2.png");
+        Texture alien24_dmg2 = ResourceLoader.loadTexture("alien_dmg2_walk_2_4.png");
+        Texture alien3_dmg2 = ResourceLoader.loadTexture("alien_dmg2_walk_3.png");
+        Texture alien68_dmg2 = ResourceLoader.loadTexture("alien_dmg2_walk_6_8.png");
+        Texture alien7_dmg2 = ResourceLoader.loadTexture("alien_dmg2_walk_7.png");
 
         gun1 = ResourceLoader.loadImage("gunFrame1.png");
         gun2 = ResourceLoader.loadImage("gunFrame2.png");
@@ -191,6 +201,22 @@ public class Game extends Canvas implements Runnable {
         alienAnim.add(alien68);
         alienAnim.add(alien7);
         alienAnim.add(alien68);
+        alienAnim.add(alien15_dmg1);
+        alienAnim.add(alien24_dmg1);
+        alienAnim.add(alien3_dmg1);
+        alienAnim.add(alien24_dmg1);
+        alienAnim.add(alien15_dmg1);
+        alienAnim.add(alien68_dmg1);
+        alienAnim.add(alien7_dmg1);
+        alienAnim.add(alien68_dmg1);
+        alienAnim.add(alien15_dmg2);
+        alienAnim.add(alien24_dmg2);
+        alienAnim.add(alien3_dmg2);
+        alienAnim.add(alien24_dmg2);
+        alienAnim.add(alien15_dmg2);
+        alienAnim.add(alien68_dmg2);
+        alienAnim.add(alien7_dmg2);
+        alienAnim.add(alien68_dmg2);
 
         gunAnim = new ArrayList<>();
 

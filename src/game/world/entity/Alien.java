@@ -44,7 +44,13 @@ public class Alien extends Entity {
 
     @Override
     public Texture getTexture() {
-        Texture texture = moveAnim.get(Math.floorDiv(frameCount, 5)%moveAnim.size()).clone();
+        Texture texture;
+        if ((float)health / (float)maxHealth >= 0.666)
+            texture = moveAnim.get(Math.floorDiv(frameCount, 5) % (moveAnim.size() / 3)).clone();
+        else if ((float)health / (float)maxHealth >= 0.333)
+            texture = moveAnim.get(8 + Math.floorDiv(frameCount, 5) % (moveAnim.size() / 3)).clone();
+        else
+            texture = moveAnim.get(16 + Math.floorDiv(frameCount, 5) % (moveAnim.size() / 3)).clone();
 
         int healthBarLevel = (int) Math.floor(((float)health/(float)maxHealth) * texture.getWidth());
 
