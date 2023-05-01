@@ -31,7 +31,7 @@ public class InputListener implements KeyListener, MouseMotionListener {
     // Used to update the mouse position while player is turning
     Robot robot;
 
-    static float movementSpeed = 0.5f;
+    static float movementSpeed = 0.75f;
 
     public InputListener(Game game) throws AWTException {
         this.keys = new ArrayList<>();
