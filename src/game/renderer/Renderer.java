@@ -551,11 +551,12 @@ public class Renderer {
     public void floorVLine(int x, int y1, int y2, Vec2f bl, Vec2f ur, float floorHeight, float angle, Vec2f pos) {
         Texture texture = player.world.textures.get(0);
 
-        float scale = 20;
+        float scaleX = texture.getWidth() / 40;
+        float scaleY = texture.getHeight() / 40;
         for (int y = y1; y <= y2; y++) {
                 Vec2f worldPos = screenToFloor((float) x - (float) width / 2, (float) y - (float) height / 2, floorHeight, angle, pos);
-                int iX = (int) (Math.abs(Math.floor(texture.getWidth() * (worldPos.x - bl.x) / (ur.x - bl.x))) / scale % texture.getWidth());
-                int iY = (int) (Math.abs(Math.floor(texture.getHeight() * (worldPos.y - bl.y) / (ur.y - bl.y))) / scale % texture.getHeight());
+                int iX = (int) (Math.abs(Math.floor(texture.getWidth() * (worldPos.x - bl.x) / (ur.x - bl.x))) / scaleX % texture.getWidth());
+                int iY = (int) (Math.abs(Math.floor(texture.getHeight() * (worldPos.y - bl.y) / (ur.y - bl.y))) / scaleY % texture.getHeight());
                 screen[x + y * width] = texture.getPixel(iX, iY);
                 //if (Math.abs(worldPos.x/scale) < 1 && Math.abs(worldPos.y/scale) < 1) {
                 //    g.setColor(Color.getHSBColor(Math.abs(worldPos.x)/scale, 1, Math.abs(worldPos.y)/scale));
