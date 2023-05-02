@@ -16,8 +16,10 @@ public class World {
     Vec2f startLocation;
     float startAngle;
     int startSector;
+    public List<Vec2f> alienLocation;
+    public List<Integer> alienSector;
 
-    public World(List<Vec2f> vertices, List<Sector> sectors, List<Texture> textures, Vec2f startLocation, float startAngle, int startSector) {
+    public World(List<Vec2f> vertices, List<Sector> sectors, List<Texture> textures, Vec2f startLocation, float startAngle, int startSector, List<Vec2f> alienLocation, List<Integer> alienSector) {
         this.vertices = vertices;
         this.sectors = sectors;
         this.textures = textures;
@@ -26,6 +28,9 @@ public class World {
         this.startLocation = startLocation;
         this.startAngle = startAngle;
         this.startSector = startSector;
+
+        this.alienLocation = alienLocation;
+        this.alienSector = alienSector;
 
         System.out.println("Vertices: \n" + vertices);
         System.out.println("Sectors: \n" + sectors);

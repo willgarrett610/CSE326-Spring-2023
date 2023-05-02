@@ -19,6 +19,8 @@ public class MapLoader {
         Vec2f playerLocation = null;
         float playerAngle = 0;
         int playerSector = 0;
+        List<Vec2f> alienLocation = new ArrayList<>();
+        List<Integer> alienSector = new ArrayList<>();
 
         InputStream mapStream = null;
 
@@ -63,10 +65,15 @@ public class MapLoader {
                 playerLocation = new Vec2f(Float.parseFloat(nums[0]), Float.parseFloat(nums[1]));
                 playerAngle = Float.parseFloat(nums[2]);
                 playerSector = Integer.parseInt(nums[3]);
+            } else if (line.startsWith("alien")) {
+                line = line.replaceAll("alien[ ]+", "");
+                String[] nums = line.split("[ ]+");
+                alienLocation.add(new Vec2f(Float.parseFloat(nums[0]), Float.parseFloat(nums[1])));
+                alienSector.add(Integer.parseInt(nums[2]));
             }
         }
         in.close();
-        return new World(vertices, sectors, textures, playerLocation, playerAngle, playerSector);
+        return new World(vertices, sectors, textures, playerLocation, playerAngle, playerSector, alienLocation, alienSector);
     }
 
 }
