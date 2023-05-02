@@ -278,7 +278,7 @@ public class Game extends Canvas implements Runnable {
             && player.sector == 13) {
             player.setWorld(level2);
         } else if (player.location.distanceTo(new Vec2f(16,70)) < 3 && player.sector == 15) {
-
+            
         }
 
 //        System.out.printf("sector: %d, x: %f, y: %f\n", player.sector, player.location.x, player.location.y);
