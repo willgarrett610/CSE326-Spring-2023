@@ -95,7 +95,7 @@ public class DeathScreen extends MouseListener {
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
         if (retryBtn.contains(p) && active) {
-            game.loadWorld();
+            game.loadWorlds();
             active = false;
             System.out.println("Retrying");
         } else if (quitBtn.contains(p) && active) {

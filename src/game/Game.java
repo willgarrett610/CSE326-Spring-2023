@@ -91,11 +91,14 @@ public class Game extends Canvas implements Runnable {
     public boolean resetConfirmation = false;
     public boolean quitConfirmation = false;
 
+    private World level1;
+    private World level2;
+
     public static void main(String[] args) {
         Game game = new Game();
         game.startLoop();
         game.loadResources();
-        game.loadWorld();
+        game.loadWorlds();
         game.loading = false;
     }
 
@@ -147,16 +150,19 @@ public class Game extends Canvas implements Runnable {
         this.addMouseMotionListener(ds);
     }
 
-    public void loadWorld() {
+    public void loadWorlds() {
         // Load map
-        World world = null;
-        world = MapLoader.load("level_1.txt");
+        level1 = MapLoader.load("level_1.txt");
 
-        player = new Player(world);
+        player = new Player(level1);
 
-        for (int i = 0; i < world.alienLocation.size(); i++)
-            world.addEntity(new Alien(world, world.alienLocation.get(i), world.alienSector.get(i), player, alienAnim));
+        for (int i = 0; i < level1.alienLocation.size(); i++)
+            level1.addEntity(new Alien(level1, level1.alienLocation.get(i), level1.alienSector.get(i), player, alienAnim));
 
+        level2 = MapLoader.load("level_2.txt");
+
+        for (int i = 0; i < level2.alienLocation.size(); i++)
+            level2.addEntity(new Alien(level2, level2.alienLocation.get(i), level2.alienSector.get(i), player, alienAnim));
 
         renderer.setPlayer(player);
     }
@@ -267,8 +273,12 @@ public class Game extends Canvas implements Runnable {
             }
         }
 
-        if (player.location.distanceTo(new Vec2f(16,70)) < 3 && player.sector == 15) {
-            System.out.println("End of level");
+        if (player.world.equals(level1)
+            && player.location.distanceTo(new Vec2f(50,140)) < 3
+            && player.sector == 13) {
+            player.setWorld(level2);
+        } else if (player.location.distanceTo(new Vec2f(16,70)) < 3 && player.sector == 15) {
+
         }
 
 //        System.out.printf("sector: %d, x: %f, y: %f\n", player.sector, player.location.x, player.location.y);
@@ -526,7 +536,7 @@ public class Game extends Canvas implements Runnable {
                     g.drawImage(PauseButton_Confirm, 200, 320, 400, 100, null);
                     resetConfirmation = true;
                 } else {
-                    this.loadWorld();
+                    this.loadWorlds();
                     paused = false;
                     resetConfirmation = false;
                     System.out.println("Reset level");
