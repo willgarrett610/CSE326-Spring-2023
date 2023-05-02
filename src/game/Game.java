@@ -316,6 +316,7 @@ public class Game extends Canvas implements Runnable {
     @Override
     public void run() {
         long lastUpdate = System.currentTimeMillis();
+        sound.playSound_music(volume);
 
         while (running) {
             BufferStrategy bufStrat = startBuffer();
