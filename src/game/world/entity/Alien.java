@@ -23,6 +23,9 @@ public class Alien extends Entity {
     public static final int maxHealth = 50;
     private int health;
 
+    private long lastAttack;
+    private final static long attackDelay = 500;
+
     public Alien(World world, Vec2f location, int sector, Player player, List<Texture> moveAnim) {
         super(world, location, 0, new Vec2f((float) 5.2, (float) 9.8), sector);
         this.player = player;
@@ -32,13 +35,7 @@ public class Alien extends Entity {
 
     @Override
     public void tick() {
-        int animLength = moveAnim.size();
-        frameCount++;
-        // About to overflow and at new frame loop
-        if (frameCount >= Integer.MAX_VALUE - animLength - 1 && frameCount % animLength == 0) {
-            frameCount = 0;
-        }
-    tryAttack();
+        tryAttack();
         moveTowardPlayer(player);
     }
 
@@ -64,8 +61,15 @@ public class Alien extends Entity {
     }
 
     public void moveTowardPlayer(Player player) {
-//        System.out.println("Alien: " + this.location);
-//        System.out.println("Player: " + player.location);
+        if (this.location.distanceTo(player.location) <= 10) return;
+
+        int animLength = moveAnim.size();
+        frameCount++;
+        // About to overflow and at new frame loop
+        if (frameCount >= Integer.MAX_VALUE - animLength - 1 && frameCount % animLength == 0) {
+            frameCount = 0;
+        }
+
         Vec2f vel = this.getLocation().pointToNormalized(player.location);
         vel = vel.multiply(SPEED, SPEED);
         this.move(this.getLocation().add(vel));
@@ -83,8 +87,11 @@ public class Alien extends Entity {
     }
 
     public void tryAttack() {
-        if (this.location.distanceTo(player.location) <= 10) {
-            player.health -= 1;
+        if (System.currentTimeMillis() - this.lastAttack >= attackDelay
+                && this.location.distanceTo(player.location) <= 13
+                && this.sector == player.sector) {
+            lastAttack = System.currentTimeMillis();
+            player.health -= 5;
         }
     }
 
