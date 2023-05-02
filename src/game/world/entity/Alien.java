@@ -7,6 +7,8 @@ import game.world.World;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Alien extends Entity {
 
@@ -30,15 +32,13 @@ public class Alien extends Entity {
 
     @Override
     public void tick() {
-        if (this.location.distanceTo(player.location) <= 10) return;
-
         int animLength = moveAnim.size();
         frameCount++;
         // About to overflow and at new frame loop
         if (frameCount >= Integer.MAX_VALUE - animLength - 1 && frameCount % animLength == 0) {
             frameCount = 0;
         }
-
+    tryAttack();
         moveTowardPlayer(player);
     }
 
@@ -79,6 +79,12 @@ public class Alien extends Entity {
         this.health -= damage;
         if (this.health <= 0) {
             this.kill();
+        }
+    }
+
+    public void tryAttack() {
+        if (this.location.distanceTo(player.location) <= 10) {
+            player.health -= 1;
         }
     }
 

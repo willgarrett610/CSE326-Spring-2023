@@ -1,16 +1,20 @@
 package game.world;
 
+import game.Game;
+import game.menu.DeathScreen;
+import game.menu.HUD;
 import game.renderer.Texture;
-import game.world.entity.Alien;
-import game.world.entity.Entity;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-public class Player extends Moveable{
+public class Player extends Moveable {
     public float angle;
     public int health;
 
+    //Gun frame information
+    List<Texture> shootAnim;
     private int frameCount = 0;
 
     public Player(World world) {
@@ -26,6 +30,10 @@ public class Player extends Moveable{
         this.angle = world.startAngle;
     }
 
+    public void shoot() {
+        System.out.println("Bang!");
+    }
+
     public int shoot_anim(List<BufferedImage> shootAnim, boolean shooting) {
         int animLength = shootAnim.size();
         if (shooting) {
@@ -35,11 +43,25 @@ public class Player extends Moveable{
                     frameCount > ((animLength - 1) * 3)) {
                 frameCount = 0;
             }
-
             //System.out.println(Math.floorDiv(frameCount, 3) % shootAnim.size());
             //System.out.println(frameCount);
             return Math.floorDiv(frameCount, 3) % animLength;
         }
         return 0;
     }
+
+    public void drawInterfaces(Graphics g) {
+        HUD hud = new HUD(this);
+        hud.draw(g, this);
+    }
+
+//    public void drawHUD(Graphics g) {
+//        HUD hud = new HUD(this);
+//        hud.draw(g, this);
+//    }
+//
+//    public void drawDeathScreen(Graphics g) {
+//        DeathScreen ds = new DeathScreen(this);
+//        ds.draw(g);
+//    }
 }

@@ -58,4 +58,6 @@ public abstract class Entity extends Moveable {
         this.sector = sector;
     }
 
+    public void tryAttack() {
+    }
 }

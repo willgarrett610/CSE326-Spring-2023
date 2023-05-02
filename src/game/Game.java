@@ -2,8 +2,8 @@ package game;
 
 import game.input.InputListener;
 import game.input.MouseListener;
+import game.menu.DeathScreen;
 import game.menu.MainMenu;
-import game.menu.UI;
 import game.renderer.Renderer;
 import game.renderer.Texture;
 import game.settings.SoundControl;
@@ -19,9 +19,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.nio.Buffer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static java.lang.Math.*;
@@ -44,7 +42,7 @@ public class Game extends Canvas implements Runnable {
     private SoundControl sound;
 
     public final MainMenu menu;
-    private UI ui;
+    public DeathScreen ds;
 
     public Renderer renderer;
 
@@ -67,6 +65,7 @@ public class Game extends Canvas implements Runnable {
     BufferedImage Settings_Vol;
 
     BufferedImage mainMenu;
+    BufferedImage gunCursor;
 
     List<Texture> alienAnim;
 
@@ -143,6 +142,8 @@ public class Game extends Canvas implements Runnable {
 
         this.addMouseListener(menu);
         this.addMouseMotionListener(menu);
+        this.addMouseListener(ds);
+        this.addMouseMotionListener(ds);
 
 
     }
@@ -239,7 +240,7 @@ public class Game extends Canvas implements Runnable {
         renderer.render();
         System.arraycopy(renderer.screen, 0, screen, 0, width * height);
 
-        drawMenu(mainMenu, g);
+        drawMenu(mainMenu, g, this.frame);
 
         int realFPS = Math.round(1000f / (float) timeElapsed);
         g.setColor(Color.BLACK);
@@ -249,7 +250,7 @@ public class Game extends Canvas implements Runnable {
 
     public void update(Graphics g) {
         //Character cannot move if game is paused
-        if (!paused) {
+        if (!paused && (player.health > 0)) {
             inputs.checkInput();
         }
         paused = pauseButton(g, paused, this.frame);
@@ -261,8 +262,10 @@ public class Game extends Canvas implements Runnable {
         }
 
         // Update entities
-        for (Entity e : player.world.entities) {
-            e.tick();
+        if (!paused && !menu.active) {
+            for (Entity e : player.world.entities) {
+                e.tick();
+            }
         }
     }
 
@@ -313,7 +316,9 @@ public class Game extends Canvas implements Runnable {
                 render(g, timeElapsed);
 
                 if (!menu.active) {
-                    shoot_func(g);
+                    if (player.health > 0) {
+                        shoot_func(g);
+                    }
                 }
             } else if (paused & !inSettings) {
                 paused = mouseinputs.pauseButtonCondition_resume(200, 100, 400, 100, frame);
@@ -547,15 +552,22 @@ public class Game extends Canvas implements Runnable {
      * @param g graphics drawer
      * @author Isaiah Sandoval
      */
-    public void drawMenu(BufferedImage mainMenu, Graphics g) {
+    public void drawMenu(BufferedImage mainMenu, Graphics g, JFrame frame) {
         if (menu.active) {
             frame.getContentPane().setCursor(Cursor.getDefaultCursor());
             menu.draw(g, getHeight(), getWidth(), mainMenu);
         } else {
+            player.drawInterfaces(g);
             BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
             Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-                cursorImg, new Point(0, 0), "blank cursor");
+                    cursorImg, new Point(0, 0), "blank cursor");
             frame.getContentPane().setCursor(blankCursor);
+        }
+
+        if (player.health <= 0) {
+            frame.getContentPane().setCursor(Cursor.getDefaultCursor());
+            ds = new DeathScreen(player);
+            ds.draw(g);
         }
     }
 }
