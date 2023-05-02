@@ -55,7 +55,7 @@ public class Player extends Moveable {
         hud.draw(g, this);
     }
 
-//    public void drawHUD(Graphics g) {
+    //    public void drawHUD(Graphics g) {
 //        HUD hud = new HUD(this);
 //        hud.draw(g, this);
 //    }
