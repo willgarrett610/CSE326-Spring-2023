@@ -154,9 +154,9 @@ public class Game extends Canvas implements Runnable {
 
         player = new Player(world);
 
-        Alien enemy = new Alien(world, player.location, player.sector, player, alienAnim);
+        for (int i = 0; i < world.alienLocation.size(); i++)
+            world.addEntity(new Alien(world, world.alienLocation.get(i), world.alienSector.get(i), player, alienAnim));
 
-        world.addEntity(enemy);
 
         renderer.setPlayer(player);
     }
