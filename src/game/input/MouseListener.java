@@ -21,12 +21,12 @@ public class MouseListener extends MouseAdapter {
     public void mouseClicked(MouseEvent e) {
         //System.out.println(e.getX() + ", " + e.getY());
         mouseClick = e.getPoint();
-        mouseclicked = true;
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         mouseHeld = true;
+        mouseclicked = true;
         //System.out.println("Mouse Held");
     }
 
