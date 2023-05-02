@@ -63,6 +63,8 @@ public class Game extends Canvas implements Runnable {
     BufferedImage Pause_Background;
     BufferedImage Slider_Background;
     BufferedImage Slider_Foreground;
+    BufferedImage Settings_Tut;
+    BufferedImage Settings_Vol;
 
     BufferedImage mainMenu;
 
@@ -170,6 +172,8 @@ public class Game extends Canvas implements Runnable {
         Slider_Background = ResourceLoader.loadImage("SliderBackground.png");
         Slider_Foreground = ResourceLoader.loadImage("SliderForeground.png");
         mainMenu = ResourceLoader.loadImage("mainmenu.png");
+        Settings_Tut = ResourceLoader.loadImage("Tutorial.png");
+        Settings_Vol = ResourceLoader.loadImage("Volume.png");
 
         Texture alien15 = ResourceLoader.loadTexture("alien.png");
         Texture alien24 = ResourceLoader.loadTexture("alien_walk_2_4.png");
@@ -318,7 +322,7 @@ public class Game extends Canvas implements Runnable {
                 pauseButtonCondition_quit(g, 200, 430, 400, 100, frame);
             } else if (paused & inSettings) {
                 inSettings = pauseButtonCondition_settingsExit(g, 200, 500, 400, 100);
-                volume = pauseButtonCondition_settingsVolume(g, 200, 320, 400, 30, volume);
+                volume = pauseButtonCondition_settingsVolume(g, 200, 180, 400, 30, volume);
             }
 
             if ((timeElapsed >= 1000 / FPS) & !loading) {
@@ -378,12 +382,14 @@ public class Game extends Canvas implements Runnable {
                 //Draw settings menu
                 g.drawImage(Pause_Background, 50, 50, 700, 700,null);
                 g.drawImage(PauseButton_Exit, 200, 500, 400, 100, null);
+                g.drawImage(Settings_Vol, 300, 80, 200, 60, null);
+                g.drawImage(Settings_Tut, 130, 200, 500, 250, null);
 
                 int sliderWidth = 400/100 * ((int) volume);
 
                 //Draw sliders
-                g.drawImage(Slider_Background, 200, 300, 400, 10, null);
-                g.drawImage(Slider_Foreground, 200, 300, sliderWidth, 10, null);
+                g.drawImage(Slider_Background, 200, 160, 400, 10, null);
+                g.drawImage(Slider_Foreground, 200, 160, sliderWidth, 10, null);
 
                 //reset confirmation conditions
                 resetConfirmation = false;
@@ -427,8 +433,8 @@ public class Game extends Canvas implements Runnable {
                 int sliderWidth = 400/100 * ((int) volume);
 
                 //Draw sliders
-                g.drawImage(Slider_Background, 200, 300, 400, 10, null);
-                g.drawImage(Slider_Foreground, 200, 300, sliderWidth, 10, null);
+                g.drawImage(Slider_Background, 200, 160, 400, 10, null);
+                g.drawImage(Slider_Foreground, 200, 160, sliderWidth, 10, null);
             }
         }
         return volume;
@@ -437,7 +443,7 @@ public class Game extends Canvas implements Runnable {
     public void shoot_func(Graphics g) {
         if (mouseinputs.mouseclicked == true) {
             if (shoot_cond == false) {
-                sound.playSound_shoot();
+                sound.playSound_shoot(volume);
 
                 //System.out.println("Shoot");
                 //System.out.println(player.angle);
