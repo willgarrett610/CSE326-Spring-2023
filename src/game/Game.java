@@ -151,7 +151,7 @@ public class Game extends Canvas implements Runnable {
     public void loadWorld() {
         // Load map
         World world = null;
-        world = MapLoader.load("level_2.txt");
+        world = MapLoader.load("level_1.txt");
 
         player = new Player(world);
 
