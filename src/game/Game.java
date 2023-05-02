@@ -9,6 +9,7 @@ import game.renderer.Texture;
 import game.settings.SoundControl;
 import game.world.MapLoader;
 import game.world.Player;
+import game.world.Vec2f;
 import game.world.World;
 import game.world.entity.Alien;
 import game.world.entity.Entity;
@@ -144,8 +145,6 @@ public class Game extends Canvas implements Runnable {
         this.addMouseMotionListener(menu);
         this.addMouseListener(ds);
         this.addMouseMotionListener(ds);
-
-
     }
 
     public void loadWorld() {
@@ -267,6 +266,13 @@ public class Game extends Canvas implements Runnable {
                 e.tick();
             }
         }
+
+        if (player.location.distanceTo(new Vec2f(16,70)) < 3 && player.sector == 15) {
+            System.out.println("End of level");
+        }
+
+//        System.out.printf("sector: %d, x: %f, y: %f\n", player.sector, player.location.x, player.location.y);
+//        System.out.println(player.location.distanceTo(new Vec2f(120,70)));
     }
 
     public synchronized void startLoop() {
