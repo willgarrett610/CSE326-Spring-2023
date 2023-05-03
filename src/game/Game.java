@@ -4,6 +4,7 @@ import game.input.InputListener;
 import game.input.MouseListener;
 import game.menu.DeathScreen;
 import game.menu.MainMenu;
+import game.menu.WinScreen;
 import game.renderer.Renderer;
 import game.renderer.Texture;
 import game.settings.SoundControl;
@@ -32,7 +33,7 @@ public class Game extends Canvas implements Runnable {
     static final int width = 800;
     static final int height = 800;
 
-    public float volume = 50;
+    public static float volume = 50;
 
     public Player player;
 
@@ -43,6 +44,9 @@ public class Game extends Canvas implements Runnable {
     private SoundControl sound;
 
     public final MainMenu menu;
+
+    public final WinScreen winScreen;
+
     public DeathScreen ds;
 
     public Renderer renderer;
@@ -143,9 +147,12 @@ public class Game extends Canvas implements Runnable {
         buf = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         screen = ((DataBufferInt) (buf.getRaster().getDataBuffer())).getData();
         menu = new MainMenu(this);
+        winScreen = new WinScreen(this);
 
         this.addMouseListener(menu);
         this.addMouseMotionListener(menu);
+        this.addMouseListener(winScreen);
+        this.addMouseMotionListener(winScreen);
         this.addMouseListener(ds);
         this.addMouseMotionListener(ds);
     }
@@ -278,7 +285,8 @@ public class Game extends Canvas implements Runnable {
             && player.sector == 13) {
             player.setWorld(level2);
         } else if (player.location.distanceTo(new Vec2f(16,70)) < 3 && player.sector == 15) {
-            
+            winScreen.active = true;
+            frame.getContentPane().setCursor(Cursor.getDefaultCursor());
         }
 
 //        System.out.printf("sector: %d, x: %f, y: %f\n", player.sector, player.location.x, player.location.y);
@@ -328,11 +336,13 @@ public class Game extends Canvas implements Runnable {
             mousePos = new Point(mousePos.x - frame.getLocation().x, mousePos.y - frame.getLocation().y);
 
             long timeElapsed = System.currentTimeMillis() - lastUpdate;
-            if ((timeElapsed >= 1000 / FPS) & !paused) {
+            if (winScreen.active) {
+                winScreen.draw(g);
+            } else if ((timeElapsed >= 1000 / FPS) & !paused) {
                 lastUpdate = System.currentTimeMillis();
                 render(g, timeElapsed);
 
-                if (!menu.active) {
+                if (!menu.active || winScreen.active) {
                     if (player.health > 0) {
                         shoot_func(g);
                     }
@@ -347,7 +357,7 @@ public class Game extends Canvas implements Runnable {
                 volume = pauseButtonCondition_settingsVolume(g, 200, 180, 400, 30, volume);
             }
 
-            if ((timeElapsed >= 1000 / FPS) & !loading) {
+            if ((timeElapsed >= 1000 / FPS) && !loading && !winScreen.active) {
                 update(g);
             }
 
@@ -505,7 +515,7 @@ public class Game extends Canvas implements Runnable {
                         if ((shootAng - playerShootAng) >= -shootArc &
                                 (shootAng - playerShootAng) <= shootArc) {
                             System.out.println("Hit!");
-                            alien.damage(4);
+                            alien.damage(10);
                         }
                     }
                 }

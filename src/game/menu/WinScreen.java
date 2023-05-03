@@ -5,6 +5,7 @@ import game.input.MouseListener;
 import game.world.Player;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 
 public class WinScreen extends MouseListener {
     public boolean active;
@@ -19,10 +20,18 @@ public class WinScreen extends MouseListener {
     Game game;
 
 
-    public WinScreen() {
-        active = ;
+    public WinScreen(Game game) {
+        active = false;
+        int w, h;
+        w = 300;
+        h = 100;
 
-        
+        font = new Font("Monospaced", Font.BOLD, 50);
+
+        replayBtn = new Rectangle(50, 400, w, h);
+        quitBtn = new Rectangle(450, 400, w, h);
+
+        this.game = game;
     }
 
     public void draw (Graphics g) {
@@ -31,7 +40,7 @@ public class WinScreen extends MouseListener {
         Color moonBlueFG = new Color(76, 124, 252);
         Color moonBlueBG = new Color(50, 70, 129);
         Color doonRedFG = new Color(213, 185, 43);
-        Color doonRedBG = new color(200, 79, 43);
+        Color doonRedBG = new Color(200, 79, 43);
 
         g.setColor(Color.RED);
         g2d.fill(replayBtn);
@@ -60,7 +69,7 @@ public class WinScreen extends MouseListener {
         if (replayHover) {
             g.setColor(moonBlueFG);
             g2d.fill(replayBtn);
-            g.setColor(moomBlueBG);
+            g.setColor(moonBlueBG);
             g2d.draw(replayBtn);
             g.setColor(Color.WHITE);
             strW = g.getFontMetrics(font).stringWidth(replay);
@@ -88,8 +97,15 @@ public class WinScreen extends MouseListener {
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
         if (replayBtn.contains(p) && active) {
-            game.MainMenu();
+            // TODO go to main menu?
+            game.loadWorlds();
             active = false;
+
+            BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+            Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+                    cursorImg, new Point(0, 0), "blank cursor");
+            game.frame.getContentPane().setCursor(blankCursor);
+
             System.out.println("Returning to Menu");
         } else if (quitBtn.contains(p) && active) {
             System.out.println("Exiting game");

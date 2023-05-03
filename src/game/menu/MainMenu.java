@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 
 import game.Game;
 import game.input.*;
+import game.settings.SoundControl;
 
 public class MainMenu extends MouseListener {
     public boolean active;
