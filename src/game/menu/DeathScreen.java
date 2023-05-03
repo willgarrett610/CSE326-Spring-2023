@@ -32,6 +32,7 @@ public class DeathScreen extends MouseAdapter {
         retryBtn = new Rectangle(50, 450, w, h);
         quitBtn = new Rectangle(450, 450, w, h);
 
+        this.game = game;
     }
 
     public void draw(Graphics g) {
