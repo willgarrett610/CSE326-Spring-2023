@@ -16,7 +16,8 @@ public class WinScreen extends MouseListener {
     private Rectangle quitBtn;
     private String quit = "Quit";
     private boolean quitHover = false;
-    private String  winString = "YOU HAVE BEATEN MOON DOON!";
+    private String  winString = "YOU WIN!!!";
+    private Font winFont;
     Game game;
 
 
@@ -45,6 +46,9 @@ public class WinScreen extends MouseListener {
         g.setColor(Color.RED);
         g2d.fill(replayBtn);
         g2d.fill(quitBtn);
+
+        g.setFont(winFont);
+        g.drawString(winString, 200, 300);
 
         g.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(5));

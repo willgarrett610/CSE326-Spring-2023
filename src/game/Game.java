@@ -148,6 +148,8 @@ public class Game extends Canvas implements Runnable {
         screen = ((DataBufferInt) (buf.getRaster().getDataBuffer())).getData();
         menu = new MainMenu(this);
         winScreen = new WinScreen(this);
+        //next line is used to test the win screen
+        //winScreen.active = true;
         ds = new DeathScreen(this);
 
 
