@@ -4,9 +4,10 @@ import game.Game;
 import game.input.MouseListener;
 import game.world.Player;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class DeathScreen extends MouseListener {
+public class DeathScreen extends MouseAdapter {
     public boolean active;
     private Font font;
     private Rectangle retryBtn;
@@ -16,25 +17,26 @@ public class DeathScreen extends MouseListener {
     private String quit = "Quit";
     private boolean quitHover = false;
     private String deathString = "YOU DIED";
+    private Font deathFont;
     Game game;
 
-
-    public DeathScreen(Player player) {
-        active = (player.health <= 0);
+    public DeathScreen(Game game) {
+        active = false;
         int w, h;
         w = 300;
         h = 100;
 
         font = new Font("Monospaced", Font.BOLD, 50);
+        deathFont = new Font("Monospaced", Font.BOLD, 100);
 
-        retryBtn = new Rectangle(50, 400, w, h);
-        quitBtn = new Rectangle(450, 400, w, h);
+        retryBtn = new Rectangle(50, 450, w, h);
+        quitBtn = new Rectangle(450, 450, w, h);
 
     }
 
     public void draw(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g.setFont(font);
+        g.setFont(deathFont);
         Color moomBlueFG = new Color(76, 124, 252);
         Color moomBlueBG = new Color(50, 70, 129);
         Color doonRedFG = new Color(213, 185, 43);
@@ -43,6 +45,7 @@ public class DeathScreen extends MouseListener {
         g.setColor(Color.RED);
         g2d.fill(retryBtn);
         g2d.fill(quitBtn);
+        g.drawString(deathString, 200, 300);
 
         g.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(5));
@@ -51,6 +54,7 @@ public class DeathScreen extends MouseListener {
 
 
         int strW, strH;
+        g.setFont(font);
 
         //Retry button
         strW = g.getFontMetrics(font).stringWidth(retry);

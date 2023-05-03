@@ -148,6 +148,8 @@ public class Game extends Canvas implements Runnable {
         screen = ((DataBufferInt) (buf.getRaster().getDataBuffer())).getData();
         menu = new MainMenu(this);
         winScreen = new WinScreen(this);
+        ds = new DeathScreen(this);
+
 
         this.addMouseListener(menu);
         this.addMouseMotionListener(menu);
@@ -593,7 +595,7 @@ public class Game extends Canvas implements Runnable {
 
         if (player.health <= 0) {
             frame.getContentPane().setCursor(Cursor.getDefaultCursor());
-            ds = new DeathScreen(player);
+            ds.active = true;
             ds.draw(g);
         }
     }
