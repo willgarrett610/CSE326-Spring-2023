@@ -85,9 +85,9 @@ public class WinScreen extends MouseListener {
             g.setColor(doonRedBG);
             g2d.draw(quitBtn);
             g.setColor(Color.BLACK);
-            strW = g.getFontMetrics(font).stringWidth(replay);
+            strW = g.getFontMetrics(font).stringWidth(quit);
             strH = g.getFontMetrics(font).getHeight();
-            g.drawString(replay, (int) (quitBtn .getX() + quitBtn.width / 2 - strW / 2),
+            g.drawString(quit, (int) (quitBtn .getX() + quitBtn.width / 2 - strW / 2),
                     (int) (quitBtn.getY() + quitBtn.height / 2) + strH / 3);
         }
     }
