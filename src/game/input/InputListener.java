@@ -119,7 +119,7 @@ public class InputListener implements KeyListener, MouseMotionListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (game.loading || game.menu.active || game.inSettings || game.paused) return;
+        if (game.loading || game.menu.active || game.inSettings || game.paused || game.winScreen.active) return;
 
         if (mouse == null || ignoreNext) {
             mouse = e.getPoint();
