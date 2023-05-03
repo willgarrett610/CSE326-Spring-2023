@@ -6,6 +6,8 @@ import game.world.Player;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
 
 public class DeathScreen extends MouseAdapter {
     public boolean active;
@@ -37,7 +39,6 @@ public class DeathScreen extends MouseAdapter {
 
     public void draw(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g.setFont(deathFont);
         Color moomBlueFG = new Color(76, 124, 252);
         Color moomBlueBG = new Color(50, 70, 129);
         Color doonRedFG = new Color(213, 185, 43);
@@ -46,13 +47,14 @@ public class DeathScreen extends MouseAdapter {
         g.setColor(Color.RED);
         g2d.fill(retryBtn);
         g2d.fill(quitBtn);
+
+        g.setFont(deathFont);
         g.drawString(deathString, 200, 300);
 
         g.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(5));
         g2d.draw(retryBtn);
         g2d.draw(quitBtn);
-
 
         int strW, strH;
         g.setFont(font);
