@@ -30,10 +30,9 @@ public class SoundControl {
     }
 
     public void playSound_music (float volume) {
-        try {
-            String filePath = "src/res/atDoomsGate.wav";
-            System.out.println(volume - 100);
+        String filePath = "src/res/d_e1m1.mid";
 
+        try {
             AudioInputStream audioInputStream =
                     AudioSystem.getAudioInputStream(new File(filePath));
 
@@ -43,12 +42,12 @@ public class SoundControl {
 
             System.out.println(clip);
             FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            gainControl.setValue((volume  - 100) * 0.5f);
+            gainControl.setValue((volume  - 100) * 0.6f);
 
-            clip.start();
+
+            clip.loop(100);
         } catch (Exception ex){
             //do exception handling here
         }
-
     }
 }

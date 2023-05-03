@@ -33,7 +33,7 @@ public class Game extends Canvas implements Runnable {
     static final int width = 800;
     static final int height = 800;
 
-    public float volume = 50;
+    public static float volume = 50;
 
     public Player player;
 
@@ -515,7 +515,7 @@ public class Game extends Canvas implements Runnable {
                         if ((shootAng - playerShootAng) >= -shootArc &
                                 (shootAng - playerShootAng) <= shootArc) {
                             System.out.println("Hit!");
-                            alien.damage(4);
+                            alien.damage(10);
                         }
                     }
                 }
